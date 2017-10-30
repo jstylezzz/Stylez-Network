@@ -5,7 +5,7 @@
 * 
 */
 
-using System.Collections;
+using System.Text;
 using System;
 using UnityEngine;
 using System.Net.Sockets;
@@ -26,6 +26,8 @@ public class MyDemoNetworkClient : MonoBehaviour
     private IPAddress m_ipAddr;
     private IPEndPoint m_ipe;
 
+    private byte[] m_streamBuffer;
+
 	/// <summary>
 	/// Script entry point.
 	/// </summary>
@@ -38,6 +40,7 @@ public class MyDemoNetworkClient : MonoBehaviour
             {
                 m_ipe = new IPEndPoint(m_ipAddr, m_port);
                 m_cSock.Connect(m_ipe);
+                ReceiveFromBegin();
             }
             catch(Exception e)
             {
@@ -46,6 +49,26 @@ public class MyDemoNetworkClient : MonoBehaviour
         }
         else Debug.LogError("Could not parse the server IP.");
 	}
+
+    private void ReceiveFromBegin()
+    {
+        m_streamBuffer = new byte[4];
+        m_cSock.BeginReceive(m_streamBuffer, 0, 4, SocketFlags.None, new AsyncCallback(OnBufferLengthReceived), m_cSock);
+    }
+
+    private void OnBufferLengthReceived(IAsyncResult ar)
+    {
+        int messageLength = BitConverter.ToInt32(m_streamBuffer, 0);
+        Debug.Log("LEN RECEIVED: " + messageLength);
+        m_streamBuffer = new byte[messageLength];
+        m_cSock.BeginReceive(m_streamBuffer, 0, messageLength, SocketFlags.None, new AsyncCallback(OnMessageReceived), m_cSock);
+    }
+
+    private void OnMessageReceived(IAsyncResult ar)
+    {
+        m_cSock.EndReceive(ar);
+        ReceiveFromBegin();
+    }
 
     public void OnApplicationQuit()
     {

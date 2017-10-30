@@ -9,7 +9,7 @@ namespace StylezNetworkDedicated.Manager
 {
     public class MyServerWorldCache
     {
-        private Dictionary<int, IMyNetworkObject> m_worldObjects = new Dictionary<int, StylezNetwork.Objects.IMyNetworkObject>();
+        private Dictionary<int, IMyNetworkObject> m_worldObjects = new Dictionary<int, IMyNetworkObject>();
         private Stack<int> m_freeIndexStack = new Stack<int>();
         private int m_highestObjectID = -1;
 

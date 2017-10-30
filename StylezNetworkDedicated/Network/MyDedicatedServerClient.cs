@@ -26,8 +26,18 @@ namespace StylezNetworkDedicated.Network
             this.ClientID = id;
             this.ClientSocket = s;
             m_serverInstance = sInstance;
-
+            SendMessage("TEST MET DIEREN!");
             m_aliveTimer.Start();
+        }
+
+        private void SendMessage(string text)
+        {
+            byte[] len = BitConverter.GetBytes(text.Length);
+            byte[] messageBytes = Encoding.ASCII.GetBytes(text);
+            byte[] combinedBytes = new byte[len.Length + messageBytes.Length];
+            Buffer.BlockCopy(len, 0, combinedBytes, 0, 4);
+            Buffer.BlockCopy(messageBytes, 0, combinedBytes, 4, messageBytes.Length);
+            ClientSocket.Send(combinedBytes);
         }
 
         public void Disconnect()
