@@ -40,6 +40,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\EMyNetworkCommand.cs" />
+    <Compile Include="Commands\MyAuthCommand.cs" />
     <Compile Include="MathEx\Vector3.cs" />
     <Compile Include="Objects\IMyNetworkObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

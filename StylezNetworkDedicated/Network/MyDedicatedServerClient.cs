@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
 using System.Net.Sockets;
 using System.Timers;
+using StylezNetwork.Commands;
 
 namespace StylezNetworkDedicated.Network
 {
@@ -31,9 +32,14 @@ namespace StylezNetworkDedicated.Network
             this.ClientSocket = s;
             m_serverInstance = sInstance;
             GenerateAuthToken();
-            
+            SendAuthRequest();
             m_aliveTimer.Start();
             Console.WriteLine("[JOIN]: Client with ID " + ClientID + " has joined the server.");
+        }
+
+        private void SendAuthRequest()
+        {
+            SendMessage(JsonConvert.SerializeObject(new MyAuthCommand(m_authToken, ClientID)));
         }
 
         public void GenerateAuthToken()
