@@ -16,7 +16,7 @@ namespace StylezNetworkDedicated.Network
 
         private Dictionary<int, MyDedicatedServerClient> m_clientRegistry = new Dictionary<int, MyDedicatedServerClient>();
         private Stack<int> m_freeIDRegistry = new Stack<int>();
-        private int m_highestClientID = 0;
+        private int m_highestClientID = -1;
         private IPAddress m_ip;
         private int m_port = 7777;
         private Socket m_serverSock;
@@ -54,7 +54,8 @@ namespace StylezNetworkDedicated.Network
         public void StopServer()
         {
             if(m_serverSock.Connected) m_serverSock.Shutdown(SocketShutdown.Both);
-            foreach (MyDedicatedServerClient c in m_clientRegistry.Values) c.Disconnect();
+            MyDedicatedServerClient[] connectedClients = m_clientRegistry.Values.ToArray();
+            for (int i = 0; i < connectedClients.Length; ++i) connectedClients[i].Disconnect();
         }
 
         private void SetupNetworkBase(string ip, int port)

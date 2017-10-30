@@ -40,7 +40,6 @@ namespace StylezNetworkDedicated.Network
         private void PerformSocketAliveCheck(object sender, ElapsedEventArgs e)
         {
             if (PollSocketForConnection() == false) Disconnect();
-            else Console.WriteLine("[DBG]: Socket is alive!");
         }
 
         private bool PollSocketForConnection()
