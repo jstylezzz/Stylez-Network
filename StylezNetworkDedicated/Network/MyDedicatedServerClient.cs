@@ -26,15 +26,21 @@ namespace StylezNetworkDedicated.Network
             this.ClientID = id;
             this.ClientSocket = s;
             m_serverInstance = sInstance;
+
+            m_aliveTimer.Start();
+        }
+
+        public void Disconnect()
+        {
+            m_aliveTimer.Stop();
+            ClientSocket.Shutdown(SocketShutdown.Both);
+            m_serverInstance.UnregisterClient(this);
         }
 
         private void PerformSocketAliveCheck(object sender, ElapsedEventArgs e)
         {
-            if(PollSocketForConnection() == false)
-            {
-                ClientSocket.Dispose();
-                m_serverInstance.UnregisterClient(this);
-            }
+            if (PollSocketForConnection() == false) Disconnect();
+            else Console.WriteLine("[DBG]: Socket is alive!");
         }
 
         private bool PollSocketForConnection()

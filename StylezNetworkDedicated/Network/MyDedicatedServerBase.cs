@@ -48,6 +48,13 @@ namespace StylezNetworkDedicated.Network
             Socket clientC = m_serverSock.EndAccept(ar);
             Console.WriteLine("[NEW]: Incoming connection from " + clientC.RemoteEndPoint.ToString());
             RegisterClient(clientC);
+            m_serverSock.BeginAccept(new AsyncCallback(ReceiveIncomingConnection), m_serverSock);
+        }
+
+        public void StopServer()
+        {
+            if(m_serverSock.Connected) m_serverSock.Shutdown(SocketShutdown.Both);
+            foreach (MyDedicatedServerClient c in m_clientRegistry.Values) c.Disconnect();
         }
 
         private void SetupNetworkBase(string ip, int port)

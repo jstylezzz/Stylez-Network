@@ -5,11 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 using StylezNetworkDedicated.Network;
 using StylezNetworkDedicated.Manager;
+using System.Threading;
 
 namespace StylezNetworkDedicated
 {
     class Program
     {
+        private static ManualResetEvent m_quitEvent = new ManualResetEvent(false);
         static void Main(string[] args)
         {
             new Program(args);
@@ -22,12 +24,21 @@ namespace StylezNetworkDedicated
         {
             MyServerEventManager.OnServerReady += OnServerReady;
             SetupDediBase(arguments);
-            Console.ReadKey();
+            Console.CancelKeyPress += (sender, e) =>
+            {
+                m_quitEvent.Set();
+                e.Cancel = true;
+            };
+
+            m_quitEvent.WaitOne();
+            Console.WriteLine("[INFO]: Server stopping..");
+            m_dediBase.StopServer();
+            Console.WriteLine("[INFO]: Server stopped..");
         }
 
         private void OnServerReady()
         {
-            Console.WriteLine("[INFO]: Server started. Press any key to close.");
+            Console.WriteLine("[INFO]: Server started. Press CTRL+C to close.");
         }
 
         private void SetupDediBase(string[] arguments)
