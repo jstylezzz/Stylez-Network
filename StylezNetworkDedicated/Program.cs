@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StylezNetworkDedicated.Network;
+using StylezNetworkDedicated.Manager;
 
 namespace StylezNetworkDedicated
 {
@@ -19,25 +20,35 @@ namespace StylezNetworkDedicated
 
         public Program(string[] arguments)
         {
+            MyServerEventManager.OnServerReady += OnServerReady;
+            SetupDediBase(arguments);
+            Console.ReadKey();
+        }
+
+        private void OnServerReady()
+        {
+            Console.WriteLine("[INFO]: Server started. Press any key to close.");
+        }
+
+        private void SetupDediBase(string[] arguments)
+        {
             string ip;
             int port;
-            if(arguments.Length < 2)
+            if (arguments.Length < 2)
             {
                 ip = "127.0.0.1";
-                port = 7777; 
+                port = 7777;
             }
             else
             {
                 ip = arguments[0];
-                if(!Int32.TryParse(arguments[1], out port))
+                if (!Int32.TryParse(arguments[1], out port))
                 {
                     Console.WriteLine("[WARN]: Something went wrong while parsing the port. Default 7777 will be used.");
                     port = 7777;
                 }
             }
             m_dediBase = new MyDedicatedServerBase(ip, port);
-
-            Console.ReadKey();
         }
     }
 }

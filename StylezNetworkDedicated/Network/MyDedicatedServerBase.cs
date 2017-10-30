@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
+using StylezNetworkDedicated.Manager;
 
 namespace StylezNetworkDedicated.Network
 {
@@ -38,6 +39,7 @@ namespace StylezNetworkDedicated.Network
             {
                 Console.WriteLine("[FATAL ERROR]: Something went wrong while starting the server. Error message:\n" + e.Message);
             }
+            MyServerEventManager.OnServerReady?.Invoke();
         }
 
         private void SetupNetworkBase(string ip, int port)
