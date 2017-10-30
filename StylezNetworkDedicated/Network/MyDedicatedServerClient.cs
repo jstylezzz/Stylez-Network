@@ -39,7 +39,7 @@ namespace StylezNetworkDedicated.Network
 
         private void SendAuthRequest()
         {
-            SendMessage(JsonConvert.SerializeObject(new MyAuthCommand(m_authToken, ClientID)));
+            SendMessage(JsonConvert.SerializeObject(new MyAuthCommand(m_authToken, ClientID)), (int)EMyNetworkCommand.COMMAND_AUTH);
         }
 
         public void GenerateAuthToken()
@@ -50,13 +50,16 @@ namespace StylezNetworkDedicated.Network
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        private void SendMessage(string text)
+        private void SendMessage(string text, int commandid)
         {
-            byte[] len = BitConverter.GetBytes(text.Length);
-            byte[] messageBytes = Encoding.ASCII.GetBytes(text);
-            byte[] combinedBytes = new byte[len.Length + messageBytes.Length];
+            byte[] cmdId = BitConverter.GetBytes(commandid); //4 bytes
+            byte[] len = BitConverter.GetBytes(text.Length + cmdId.Length); //4 bytes
+
+            byte[] messageBytes = Encoding.ASCII.GetBytes(text); //? bytes
+            byte[] combinedBytes = new byte[len.Length + cmdId.Length + messageBytes.Length];
             Buffer.BlockCopy(len, 0, combinedBytes, 0, 4);
-            Buffer.BlockCopy(messageBytes, 0, combinedBytes, 4, messageBytes.Length);
+            Buffer.BlockCopy(cmdId, 0, combinedBytes, 4, cmdId.Length);
+            Buffer.BlockCopy(messageBytes, 0, combinedBytes, 8, messageBytes.Length);
             ClientSocket.Send(combinedBytes);
         }
 

@@ -27,6 +27,7 @@ public class MyDemoNetworkClient : MonoBehaviour
     private IPEndPoint m_ipe;
 
     private byte[] m_streamBuffer;
+    private int m_activeBufferLength;
 
 	/// <summary>
 	/// Script entry point.
@@ -59,7 +60,6 @@ public class MyDemoNetworkClient : MonoBehaviour
     private void OnBufferLengthReceived(IAsyncResult ar)
     {
         int messageLength = BitConverter.ToInt32(m_streamBuffer, 0);
-        Debug.Log("LEN RECEIVED: " + messageLength);
         m_streamBuffer = new byte[messageLength];
         m_cSock.BeginReceive(m_streamBuffer, 0, messageLength, SocketFlags.None, new AsyncCallback(OnMessageReceived), m_cSock);
     }
@@ -67,6 +67,12 @@ public class MyDemoNetworkClient : MonoBehaviour
     private void OnMessageReceived(IAsyncResult ar)
     {
         m_cSock.EndReceive(ar);
+        byte[] cmdidBytes = new byte[4];
+        byte[] cmdBytes = new byte[m_streamBuffer.Length - 4];
+        Buffer.BlockCopy(m_streamBuffer, 0, cmdidBytes, 0, 4);
+        Buffer.BlockCopy(m_streamBuffer, 4, cmdBytes, 0, m_streamBuffer.Length-4);
+        string cmd = Encoding.ASCII.GetString(cmdBytes);
+
         ReceiveFromBegin();
     }
 
