@@ -9,7 +9,7 @@ using StylezNetworkDedicated.Manager;
 
 namespace StylezNetworkDedicated.Network
 {
-    class MyDedicatedServerBase
+    public class MyDedicatedServerBase
     {
         public IPAddress ServerIPAddress { get { return m_ip; } }
         private int Port { get { return m_port; } }
@@ -40,6 +40,14 @@ namespace StylezNetworkDedicated.Network
                 Console.WriteLine("[FATAL ERROR]: Something went wrong while starting the server. Error message:\n" + e.Message);
             }
             MyServerEventManager.OnServerReady?.Invoke();
+            m_serverSock.BeginAccept(new AsyncCallback(ReceiveIncomingConnection), m_serverSock);
+        }
+
+        private void ReceiveIncomingConnection(IAsyncResult ar)
+        {
+            Socket clientC = m_serverSock.EndAccept(ar);
+            Console.WriteLine("[NEW]: Incoming connection from " + clientC.RemoteEndPoint.ToString());
+            RegisterClient(clientC);
         }
 
         private void SetupNetworkBase(string ip, int port)
@@ -65,13 +73,14 @@ namespace StylezNetworkDedicated.Network
         private void RegisterClient(Socket s)
         {
             int freeID = GetFirstFreeClientID(true);
-            m_clientRegistry.Add(freeID, new MyDedicatedServerClient(s, freeID));
+            m_clientRegistry.Add(freeID, new MyDedicatedServerClient(s, freeID, this));
         }
 
-        private void UnregisterClient(MyDedicatedServerClient c)
+        public void UnregisterClient(MyDedicatedServerClient c)
         {
             m_freeIDRegistry.Push(c.ClientID);
             m_clientRegistry.Remove(c.ClientID);
+            Console.WriteLine("[LEAVE]: Client " + c.ClientID + " has left the server.");
         }
 
         public int GetFirstFreeClientID(bool removeOld = false)
