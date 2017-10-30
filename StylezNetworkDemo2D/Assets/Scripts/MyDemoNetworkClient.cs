@@ -29,11 +29,16 @@ public class MyDemoNetworkClient : MonoBehaviour
     private byte[] m_streamBuffer;
     private int m_activeBufferLength;
 
+    private int m_clientID;
+    private string m_token;
+    private MyDemoCommandProcessor m_cmdProcessor;
+
 	/// <summary>
 	/// Script entry point.
 	/// </summary>
 	private void Start () 
 	{
+        m_cmdProcessor = FindObjectOfType<MyDemoCommandProcessor>();
         m_cSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         if (IPAddress.TryParse(m_serverIP, out m_ipAddr))
         {
@@ -72,8 +77,18 @@ public class MyDemoNetworkClient : MonoBehaviour
         Buffer.BlockCopy(m_streamBuffer, 0, cmdidBytes, 0, 4);
         Buffer.BlockCopy(m_streamBuffer, 4, cmdBytes, 0, m_streamBuffer.Length-4);
         string cmd = Encoding.ASCII.GetString(cmdBytes);
-
+        m_cmdProcessor.ProcessCommand(BitConverter.ToInt32(cmdidBytes, 0), cmd);
         ReceiveFromBegin();
+    }
+
+    public void RegisterAuthToken(string token)
+    {
+        m_token = token;
+    }
+
+    public void RegisterClientID(int id)
+    {
+        m_clientID = id;
     }
 
     public void OnApplicationQuit()
@@ -91,6 +106,6 @@ public class MyDemoNetworkClient : MonoBehaviour
     /// </summary>
     private void Update () 
 	{
-		
+        if (m_token != null) Debug.Log("IIIIh " + m_token + " ID " + m_clientID);
 	}
 }
