@@ -7,11 +7,12 @@ using StylezNetwork.MathEx;
 
 namespace StylezNetwork.Objects
 {
-    interface IMyNetworkObject
+    public interface IMyNetworkObject
     {
         Vector3 Position { get; }
         int Dimension { get; }
         int OwnerClientID { get; }
+        int ObjectNetworkID { get; }
 
         void UpdatePosition(Vector3 newPosition);
         void UpdateDimension(int dim);

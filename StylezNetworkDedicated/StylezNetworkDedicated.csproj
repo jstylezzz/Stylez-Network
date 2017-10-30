@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Manager\MyServerEventManager.cs" />
+    <Compile Include="Manager\MyServerWorldCache.cs" />
     <Compile Include="Network\MyDedicatedServerBase.cs" />
     <Compile Include="Network\MyDedicatedServerClient.cs" />
     <Compile Include="Program.cs" />
