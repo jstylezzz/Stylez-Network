@@ -14,6 +14,10 @@ namespace StylezNetworkDedicated.Network
         public Socket ClientSocket { get; private set; }
 
         public const int SocketAliveCheckRate = 4000; //Time in milliseconds
+        public const int AuthTokenLength = 5;
+
+        private bool m_isAuthenticated = false;
+        private string m_authToken = null;
 
         private Timer m_aliveTimer;
         private MyDedicatedServerBase m_serverInstance;
@@ -26,8 +30,18 @@ namespace StylezNetworkDedicated.Network
             this.ClientID = id;
             this.ClientSocket = s;
             m_serverInstance = sInstance;
-            SendMessage("TEST MET DIEREN!");
+            GenerateAuthToken();
+            
             m_aliveTimer.Start();
+            Console.WriteLine("[JOIN]: Client with ID " + ClientID + " has joined the server.");
+        }
+
+        public void GenerateAuthToken()
+        {
+            Random random = new Random();
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            m_authToken = new string(Enumerable.Repeat(chars, AuthTokenLength)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
         private void SendMessage(string text)
