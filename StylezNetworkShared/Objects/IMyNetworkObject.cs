@@ -8,12 +8,12 @@ namespace StylezNetwork.Objects
 {
     public interface IMyNetworkObject
     {
-        Vector3 Position { get; }
+        Vector3Simple Position { get; }
         int Dimension { get; }
         int OwnerClientID { get; }
         int ObjectNetworkID { get; }
 
-        void UpdatePosition(Vector3 newPosition);
+        void UpdatePosition(Vector3Simple newPosition);
         void UpdateDimension(int dim);
     }
 }

@@ -10,12 +10,15 @@ using System;
 using UnityEngine;
 using System.Net.Sockets;
 using System.Net;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 ///
 /// </summary>
 public class MyDemoNetworkClient : MonoBehaviour
 {
+    public static MyDemoNetworkClient Instance { get; private set; }
+
     [SerializeField]
     private string m_serverIP;
 
@@ -38,6 +41,7 @@ public class MyDemoNetworkClient : MonoBehaviour
 	/// </summary>
 	private void Start () 
 	{
+        Instance = this;
         m_cmdProcessor = FindObjectOfType<MyDemoCommandProcessor>();
         m_cSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         if (IPAddress.TryParse(m_serverIP, out m_ipAddr))
@@ -81,14 +85,24 @@ public class MyDemoNetworkClient : MonoBehaviour
         ReceiveFromBegin();
     }
 
-    public void RegisterAuthToken(string token)
+    public void CompleteAuthentication(string token, int cid)
     {
+        m_clientID = cid;
         m_token = token;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
-    public void RegisterClientID(int id)
+    public void SendMessage(string text, int commandid)
     {
-        m_clientID = id;
+        byte[] cmdId = BitConverter.GetBytes(commandid); //4 bytes
+        byte[] len = BitConverter.GetBytes(text.Length + cmdId.Length); //4 bytes
+
+        byte[] messageBytes = Encoding.ASCII.GetBytes(text); //? bytes
+        byte[] combinedBytes = new byte[len.Length + cmdId.Length + messageBytes.Length];
+        Buffer.BlockCopy(len, 0, combinedBytes, 0, 4);
+        Buffer.BlockCopy(cmdId, 0, combinedBytes, 4, cmdId.Length);
+        Buffer.BlockCopy(messageBytes, 0, combinedBytes, 8, messageBytes.Length);
+        m_cSock.Send(combinedBytes);
     }
 
     public void OnApplicationQuit()
@@ -100,12 +114,4 @@ public class MyDemoNetworkClient : MonoBehaviour
         }
 
     }
-
-    /// <summary>
-    /// Script update look.
-    /// </summary>
-    private void Update () 
-	{
-        if (m_token != null) Debug.Log("IIIIh " + m_token + " ID " + m_clientID);
-	}
 }

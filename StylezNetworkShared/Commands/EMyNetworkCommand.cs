@@ -7,6 +7,7 @@ namespace StylezNetwork.Commands
 {
     public enum EMyNetworkCommand
     {
-        COMMAND_AUTH
+        COMMAND_AUTH,
+        COMMAND_OBJECT_CREATE
     }
 }

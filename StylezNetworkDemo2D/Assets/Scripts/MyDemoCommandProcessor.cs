@@ -28,15 +28,14 @@ public class MyDemoCommandProcessor : MonoBehaviour
 
     public void ProcessCommand(int cmdId, string cmdJson)
     {
-        Debug.Log("CMD ID " + cmdId + " CMD " + cmdJson);
         switch ((EMyNetworkCommand)Enum.Parse(typeof(EMyNetworkCommand), cmdId.ToString()))
         {
             case EMyNetworkCommand.COMMAND_AUTH:
             {
                 MyAuthCommand authCmd = JsonUtility.FromJson<MyAuthCommand>(cmdJson);
                 
-                m_netClient.RegisterAuthToken(authCmd.AuthCode);
-                m_netClient.RegisterClientID(authCmd.ClientID);
+                m_netClient.CompleteAuthentication(authCmd.AuthCode, authCmd.ClientID);
+                m_netClient.SendMessage(cmdJson, cmdId);
                 break;
             }
         }

@@ -23,6 +23,8 @@ namespace StylezNetworkDedicated.Network
         private Timer m_aliveTimer;
         private MyDedicatedServerBase m_serverInstance;
 
+        private byte[] m_streamBuffer;
+
         public MyDedicatedServerClient(Socket s, int id, MyDedicatedServerBase sInstance)
         {
             m_aliveTimer = new Timer(SocketAliveCheckRate);
@@ -40,6 +42,39 @@ namespace StylezNetworkDedicated.Network
         private void SendAuthRequest()
         {
             SendMessage(JsonConvert.SerializeObject(new MyAuthCommand(m_authToken, ClientID)), (int)EMyNetworkCommand.COMMAND_AUTH);
+            StartReceiving();
+        }
+
+        private void StartReceiving()
+        {
+            m_streamBuffer = new byte[4];
+            ClientSocket.BeginReceive(m_streamBuffer, 0, 4, SocketFlags.None, new AsyncCallback(OnMessageLengthReceived), ClientSocket);
+        }
+
+        private void OnMessageLengthReceived(IAsyncResult ar)
+        {
+            (ar.AsyncState as Socket).EndReceive(ar);
+            int len = BitConverter.ToInt32(m_streamBuffer, 0);
+            m_streamBuffer = new byte[len];
+            ClientSocket.BeginReceive(m_streamBuffer, 0, len, SocketFlags.None, new AsyncCallback(OnMessageReceived), ClientSocket);
+        }
+
+        private void OnMessageReceived(IAsyncResult ar)
+        {
+            try
+            {
+                byte[] cmdIdBytes = new byte[4];
+                byte[] commandBytes = new byte[m_streamBuffer.Length - 4];
+                Buffer.BlockCopy(m_streamBuffer, 0, cmdIdBytes, 0, 4);
+                Buffer.BlockCopy(m_streamBuffer, 4, commandBytes, 0, commandBytes.Length);
+                int cmdID = BitConverter.ToInt32(cmdIdBytes, 0);
+                string command = Encoding.ASCII.GetString(commandBytes);
+                Console.WriteLine(command);
+            }
+            catch
+            {
+                Disconnect();
+            }
         }
 
         public void GenerateAuthToken()
