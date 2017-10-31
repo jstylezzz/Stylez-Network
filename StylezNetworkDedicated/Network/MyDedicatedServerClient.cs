@@ -69,7 +69,7 @@ namespace StylezNetworkDedicated.Network
                 Buffer.BlockCopy(m_streamBuffer, 4, commandBytes, 0, commandBytes.Length);
                 int cmdID = BitConverter.ToInt32(cmdIdBytes, 0);
                 string command = Encoding.ASCII.GetString(commandBytes);
-                Console.WriteLine(command);
+                Program.Instance.CommandProcessorInstance.ProcessCommand(cmdID, command);
             }
             catch
             {

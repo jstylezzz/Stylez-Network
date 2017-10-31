@@ -16,6 +16,7 @@ namespace StylezNetworkDedicated.Manager
         public void AddObjectToWorld(IMyNetworkObject o)
         {
             m_worldObjects.Add(GetFirstFreeObjectID(true), o);
+            Console.WriteLine("[DBG]: Object added to world.");
         }
 
         public void RemoveObjectFromWorld(IMyNetworkObject o)

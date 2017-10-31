@@ -46,6 +46,7 @@
     <Compile Include="Commands\MyCreateObjectCommand.cs" />
     <Compile Include="MathEx\Vector3Simple.cs" />
     <Compile Include="Objects\IMyNetworkObject.cs" />
+    <Compile Include="Objects\MyPlayerEntityWorldObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
