@@ -6,7 +6,7 @@ using StylezNetwork.MathEx;
 
 namespace StylezNetwork.Objects
 {
-    public class MyPlayerEntityWorldObject : IMyNetworkObject
+    public class MySimpleWorldObject : IMyNetworkObject
     {
         public Vector3Simple Position { get; private set; }
 
@@ -16,7 +16,7 @@ namespace StylezNetwork.Objects
 
         public int ObjectNetworkID { get; private set; }
 
-        public MyPlayerEntityWorldObject(Vector3Simple pos, int dim, int networkID, int clientID)
+        public MySimpleWorldObject(Vector3Simple pos, int dim, int networkID, int clientID)
         {
             Position = pos;
             Dimension = dim;

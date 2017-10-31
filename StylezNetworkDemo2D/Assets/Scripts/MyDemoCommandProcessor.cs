@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using StylezNetwork.Commands;
+using StylezNetwork.Objects;
 
 /// <summary>
 ///
@@ -35,6 +36,20 @@ public class MyDemoCommandProcessor : MonoBehaviour
                 MyAuthCommand authCmd = JsonUtility.FromJson<MyAuthCommand>(cmdJson);
                 
                 m_netClient.CompleteAuthentication(authCmd.AuthCode, authCmd.ClientID);
+                break;
+            }
+            case EMyNetworkCommand.COMMAND_WORLD_GETOBJECTS:
+            {
+                MyRequestAllObjectsCommand cmd = JsonUtility.FromJson<MyRequestAllObjectsCommand>(cmdJson);
+                for (int i = 0; i < cmd.WorldObjectLocations.Length; i++)
+                {
+                    
+                    MyMainThreadPump.Instance().Enqueue(() =>
+                    {
+                        GameObject g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                        g.transform.position = new Vector3((float)cmd.WorldObjectLocations[0].x, (float)cmd.WorldObjectLocations[0].y, (float)cmd.WorldObjectLocations[0].z);
+                    });
+                }
                 break;
             }
         }

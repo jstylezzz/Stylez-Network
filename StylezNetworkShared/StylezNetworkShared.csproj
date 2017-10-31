@@ -44,9 +44,11 @@
     <Compile Include="Commands\EMyNetworkCommand.cs" />
     <Compile Include="Commands\MyAuthCommand.cs" />
     <Compile Include="Commands\MyCreateObjectCommand.cs" />
+    <Compile Include="Commands\MyRequestAllObjectsCommand.cs" />
     <Compile Include="MathEx\Vector3Simple.cs" />
     <Compile Include="Objects\IMyNetworkObject.cs" />
-    <Compile Include="Objects\MyPlayerEntityWorldObject.cs" />
+    <Compile Include="Objects\MyNetworkObjectPositionData.cs" />
+    <Compile Include="Objects\MySimpleWorldObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

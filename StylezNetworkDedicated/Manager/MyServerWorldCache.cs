@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StylezNetwork.Objects;
+using StylezNetwork.MathEx;
 
 namespace StylezNetworkDedicated.Manager
 {
@@ -32,6 +33,16 @@ namespace StylezNetworkDedicated.Manager
         public IMyNetworkObject GetNetworkObject(int id)
         {
             return m_worldObjects[id];
+        }
+
+        public IMyNetworkObject[] GetNetworkObjects(Vector3Simple point, int dim, double dist)
+        {
+            List<IMyNetworkObject> objects = new List<IMyNetworkObject>();
+            foreach(IMyNetworkObject o in m_worldObjects.Values)
+            {
+                if (o.Dimension == dim && Vector3Simple.Distance(o.Position, point) <= dist) objects.Add(o);
+            }
+            return objects.ToArray();
         }
 
         public void RemoveAllObjectsFromPlayer(IMyNetworkObject[] o, int clientid)

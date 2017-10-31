@@ -87,7 +87,7 @@ namespace StylezNetworkDedicated.Network
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
 
-        private void SendMessage(string text, int commandid)
+        public void SendMessage(string text, int commandid)
         {
             byte[] cmdId = BitConverter.GetBytes(commandid); //4 bytes
             byte[] len = BitConverter.GetBytes(text.Length + cmdId.Length); //4 bytes

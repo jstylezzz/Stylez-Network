@@ -17,7 +17,15 @@ namespace StylezNetworkDedicated.Manager
                 case EMyNetworkCommand.COMMAND_OBJECT_CREATE:
                 {
                     MyCreateObjectCommand cmd = JsonConvert.DeserializeObject<MyCreateObjectCommand>(cmdJson);
-                    Program.Instance.WorldCacheInstance.AddObjectToWorld(new MyPlayerEntityWorldObject(cmd.AtPosition, cmd.InDimension, Program.Instance.WorldCacheInstance.GetFirstFreeObjectID(true), fromClient));
+                    Program.Instance.WorldCacheInstance.AddObjectToWorld(new MySimpleWorldObject(cmd.AtPosition, cmd.InDimension, Program.Instance.WorldCacheInstance.GetFirstFreeObjectID(true), fromClient));
+                    break;
+                }
+                case EMyNetworkCommand.COMMAND_WORLD_GETOBJECTS:
+                {
+                    MyRequestAllObjectsCommand requestCommand = JsonConvert.DeserializeObject<MyRequestAllObjectsCommand>(cmdJson);
+                    IMyNetworkObject[] objectsToSend = Program.Instance.WorldCacheInstance.GetNetworkObjects(requestCommand.LoadingPoint, requestCommand.LoadingDimension, requestCommand.LoadingDistance);
+                    MyRequestAllObjectsCommand outCommand = new MyRequestAllObjectsCommand(objectsToSend);
+                    Program.Instance.ServerBaseInstance.ClientRegistry[fromClient].SendMessage(JsonConvert.SerializeObject(outCommand), (int)EMyNetworkCommand.COMMAND_WORLD_GETOBJECTS);
                     break;
                 }
             }
