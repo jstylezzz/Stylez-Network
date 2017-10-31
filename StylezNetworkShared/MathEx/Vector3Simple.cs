@@ -5,11 +5,12 @@ using System.Text;
 
 namespace StylezNetwork.MathEx
 {
+    [Serializable]
     public class Vector3Simple
     {
-        public float x { get; set; }
-        public float y { get; set; }
-        public float z { get; set; }
+        public double x;
+        public double y;
+        public double z;
 
         public static Vector3Simple Zero { get { return new Vector3Simple(0, 0, 0); } }
         public static Vector3Simple Left { get { return new Vector3Simple(-1, 0, 0); } }
@@ -21,21 +22,21 @@ namespace StylezNetwork.MathEx
 
         public Vector3Simple()
         {
-            this.x = 0f;
-            this.y = 0f;
-            this.z = 0f;
+            this.x = 0d;
+            this.y = 0d;
+            this.z = 0d;
         }
 
-        public Vector3Simple(float x, float y, float z)
+        public Vector3Simple(double x, double y, double z)
         {
             this.x = x;
             this.y = y;
             this.z = z;
         }
 
-        public static float Distance(Vector3Simple a, Vector3Simple b)
+        public static double Distance(Vector3Simple a, Vector3Simple b)
         {
-            return (float)Math.Sqrt(Math.Pow(a.x - b.x, 2) + Math.Pow(a.y - b.y, 2) + Math.Pow(a.z - b.z, 2));
+            return Math.Sqrt(Math.Pow(a.x - b.x, 2) + Math.Pow(a.y - b.y, 2) + Math.Pow(a.z - b.z, 2));
         }
     }
 }

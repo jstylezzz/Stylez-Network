@@ -23,7 +23,7 @@ public class MyNetworkObject : MonoBehaviour
 	private void Start () 
 	{
         MyCreateObjectCommand cmd = new MyCreateObjectCommand(new Vector3Simple(transform.position.x, transform.position.y, transform.position.z), 0);
-        MyDemoNetworkClient.Instance.SendMessage(JsonUtility.ToJson(cmd), EMyNetworkCommand.COMMAND_OBJECT_CREATE);
+        MyDemoNetworkClient.Instance.SendNetworkMessage(JsonUtility.ToJson(cmd), (int)EMyNetworkCommand.COMMAND_OBJECT_CREATE);
 	}
 	
 	/// <summary>

@@ -211,6 +211,7 @@ GameObject:
   - component: {fileID: 1962503178}
   - component: {fileID: 1962503180}
   - component: {fileID: 1962503181}
+  - component: {fileID: 1962503182}
   m_Layer: 0
   m_Name: NetworkDemoObject
   m_TagString: Untagged
@@ -267,3 +268,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PersistanceIdentifier: NetworkObjectPersistance
+--- !u!114 &1962503182
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1962503177}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bc3b422790c5864190ddce32213fc03, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

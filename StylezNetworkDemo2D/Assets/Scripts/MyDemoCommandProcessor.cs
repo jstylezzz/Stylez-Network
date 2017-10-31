@@ -35,7 +35,6 @@ public class MyDemoCommandProcessor : MonoBehaviour
                 MyAuthCommand authCmd = JsonUtility.FromJson<MyAuthCommand>(cmdJson);
                 
                 m_netClient.CompleteAuthentication(authCmd.AuthCode, authCmd.ClientID);
-                m_netClient.SendMessage(cmdJson, cmdId);
                 break;
             }
         }

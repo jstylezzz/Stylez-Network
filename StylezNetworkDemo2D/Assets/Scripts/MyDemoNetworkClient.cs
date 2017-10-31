@@ -89,10 +89,11 @@ public class MyDemoNetworkClient : MonoBehaviour
     {
         m_clientID = cid;
         m_token = token;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+        
+        MyMainThreadPump.Instance().Enqueue(() => { SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1); });
     }
 
-    public void SendMessage(string text, int commandid)
+    public void SendNetworkMessage(string text, int commandid)
     {
         byte[] cmdId = BitConverter.GetBytes(commandid); //4 bytes
         byte[] len = BitConverter.GetBytes(text.Length + cmdId.Length); //4 bytes

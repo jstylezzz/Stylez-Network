@@ -44,7 +44,7 @@
     <Compile Include="Commands\EMyNetworkCommand.cs" />
     <Compile Include="Commands\MyAuthCommand.cs" />
     <Compile Include="Commands\MyCreateObjectCommand.cs" />
-    <Compile Include="MathEx\Vector3.cs" />
+    <Compile Include="MathEx\Vector3Simple.cs" />
     <Compile Include="Objects\IMyNetworkObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
