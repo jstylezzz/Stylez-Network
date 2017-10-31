@@ -11,6 +11,8 @@ namespace StylezNetworkDedicated
 {
     class Program
     {
+        public static Program Instance { get; private set; }
+
         private static ManualResetEvent m_quitEvent = new ManualResetEvent(false);
         static void Main(string[] args)
         {
@@ -18,12 +20,22 @@ namespace StylezNetworkDedicated
         }
 
 
+        public MyDedicatedServerBase ServerBaseInstance { get { return m_dediBase; } }
+        public MyDedicatedCommandProcessor CommandProcessorInstance { get { return m_cmdProcessor; } }
+        public MyServerWorldCache WorldCacheInstance { get { return m_worldCache; } }
+
         private MyDedicatedServerBase m_dediBase;
+        private MyDedicatedCommandProcessor m_cmdProcessor;
+        private MyServerWorldCache m_worldCache;
 
         public Program(string[] arguments)
         {
+            Instance = this;
             MyServerEventManager.OnServerReady += OnServerReady;
             SetupDediBase(arguments);
+            m_cmdProcessor = new MyDedicatedCommandProcessor();
+            m_worldCache = new MyServerWorldCache();
+
             Console.CancelKeyPress += (sender, e) =>
             {
                 m_quitEvent.Set();
