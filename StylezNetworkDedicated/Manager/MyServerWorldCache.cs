@@ -15,8 +15,9 @@ namespace StylezNetworkDedicated.Manager
 
         public void AddObjectToWorld(IMyNetworkObject o)
         {
-            m_worldObjects.Add(GetFirstFreeObjectID(true), o);
-            Console.WriteLine("[DBG]: Object added to world.");
+            m_worldObjects.Add(o.ObjectNetworkID, o);
+            Program.Instance.ServerBaseInstance.ClientRegistry[o.OwnerClientID].RegisterPlayerWorldObject(o);
+            Console.WriteLine($"[DBG]: Object added to world with ID {o.ObjectNetworkID} from client {o.OwnerClientID}.");
         }
 
         public void RemoveObjectFromWorld(IMyNetworkObject o)
@@ -24,6 +25,8 @@ namespace StylezNetworkDedicated.Manager
             int id = o.ObjectNetworkID;
             m_freeIndexStack.Push(id);
             m_worldObjects.Remove(id);
+            Program.Instance.ServerBaseInstance.ClientRegistry[o.OwnerClientID].UnregisterPlayerWorldObject(o);
+            Console.WriteLine($"[DBG]: Remove object with ID {id} with owner id {o.OwnerClientID} from the world.");
         }
 
         public IMyNetworkObject GetNetworkObject(int id)
@@ -31,7 +34,16 @@ namespace StylezNetworkDedicated.Manager
             return m_worldObjects[id];
         }
 
-        private int GetFirstFreeObjectID(bool removeUsed = false)
+        public void RemoveAllObjectsFromPlayer(IMyNetworkObject[] o, int clientid)
+        {
+            for (int i = 0; i < o.Length; i++)
+            {
+                //Check if the client is the owner, just to be sure
+                if (o[i].OwnerClientID == clientid) RemoveObjectFromWorld(o[i]);
+            }
+        }
+
+        public int GetFirstFreeObjectID(bool removeUsed = false)
         {
             if (removeUsed)
             {

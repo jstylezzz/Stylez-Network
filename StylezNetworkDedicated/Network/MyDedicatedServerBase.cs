@@ -13,6 +13,7 @@ namespace StylezNetworkDedicated.Network
     {
         public IPAddress ServerIPAddress { get { return m_ip; } }
         private int Port { get { return m_port; } }
+        public Dictionary<int, MyDedicatedServerClient> ClientRegistry { get { return m_clientRegistry; } }
 
         private Dictionary<int, MyDedicatedServerClient> m_clientRegistry = new Dictionary<int, MyDedicatedServerClient>();
         private Stack<int> m_freeIDRegistry = new Stack<int>();

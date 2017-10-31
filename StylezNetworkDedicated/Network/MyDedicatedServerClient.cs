@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using System.Net.Sockets;
 using System.Timers;
 using StylezNetwork.Commands;
+using StylezNetwork.Objects;
 
 namespace StylezNetworkDedicated.Network
 {
@@ -17,11 +18,11 @@ namespace StylezNetworkDedicated.Network
         public const int SocketAliveCheckRate = 4000; //Time in milliseconds
         public const int AuthTokenLength = 5;
 
-        private bool m_isAuthenticated = false;
         private string m_authToken = null;
 
         private Timer m_aliveTimer;
         private MyDedicatedServerBase m_serverInstance;
+        private Dictionary<int, IMyNetworkObject> m_registeredClientObjects = new Dictionary<int, IMyNetworkObject>();
 
         private byte[] m_streamBuffer;
 
@@ -69,7 +70,8 @@ namespace StylezNetworkDedicated.Network
                 Buffer.BlockCopy(m_streamBuffer, 4, commandBytes, 0, commandBytes.Length);
                 int cmdID = BitConverter.ToInt32(cmdIdBytes, 0);
                 string command = Encoding.ASCII.GetString(commandBytes);
-                Program.Instance.CommandProcessorInstance.ProcessCommand(cmdID, command);
+                Program.Instance.CommandProcessorInstance.ProcessCommand(cmdID, command, ClientID);
+                StartReceiving();
             }
             catch
             {
@@ -102,7 +104,18 @@ namespace StylezNetworkDedicated.Network
         {
             m_aliveTimer.Stop();
             ClientSocket.Shutdown(SocketShutdown.Both);
+            Program.Instance.WorldCacheInstance.RemoveAllObjectsFromPlayer(m_registeredClientObjects.Values.ToArray(), ClientID);
             m_serverInstance.UnregisterClient(this);
+        }
+
+        public void RegisterPlayerWorldObject(IMyNetworkObject o)
+        {
+            m_registeredClientObjects.Add(o.ObjectNetworkID, o);
+        }
+
+        public void UnregisterPlayerWorldObject(IMyNetworkObject o)
+        {
+            m_registeredClientObjects.Remove(o.ObjectNetworkID);
         }
 
         private void PerformSocketAliveCheck(object sender, ElapsedEventArgs e)

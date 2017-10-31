@@ -10,14 +10,14 @@ namespace StylezNetworkDedicated.Manager
 {
     public class MyDedicatedCommandProcessor
     {
-        public void ProcessCommand(int cmdId, string cmdJson)
+        public void ProcessCommand(int cmdId, string cmdJson, int fromClient)
         {
             switch ((EMyNetworkCommand)Enum.Parse(typeof(EMyNetworkCommand), cmdId.ToString()))
             {
                 case EMyNetworkCommand.COMMAND_OBJECT_CREATE:
                 {
                     MyCreateObjectCommand cmd = JsonConvert.DeserializeObject<MyCreateObjectCommand>(cmdJson);
-                    Program.Instance.WorldCacheInstance.AddObjectToWorld(new MyPlayerEntityWorldObject(cmd.AtPosition, cmd.InDimension));
+                    Program.Instance.WorldCacheInstance.AddObjectToWorld(new MyPlayerEntityWorldObject(cmd.AtPosition, cmd.InDimension, Program.Instance.WorldCacheInstance.GetFirstFreeObjectID(true), fromClient));
                     break;
                 }
             }

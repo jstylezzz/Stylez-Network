@@ -16,10 +16,12 @@ namespace StylezNetwork.Objects
 
         public int ObjectNetworkID { get; private set; }
 
-        public MyPlayerEntityWorldObject(Vector3Simple pos, int dim)
+        public MyPlayerEntityWorldObject(Vector3Simple pos, int dim, int networkID, int clientID)
         {
             Position = pos;
             Dimension = dim;
+            OwnerClientID = clientID;
+            ObjectNetworkID = networkID;
         }
 
         public void UpdateDimension(int dim)
