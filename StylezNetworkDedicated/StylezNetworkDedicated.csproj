@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Manager\MyDedicatedClientData.cs" />
     <Compile Include="Manager\MyDedicatedCommandProcessor.cs" />
     <Compile Include="Manager\MyServerEventManager.cs" />
     <Compile Include="Manager\MyServerWorldCache.cs" />

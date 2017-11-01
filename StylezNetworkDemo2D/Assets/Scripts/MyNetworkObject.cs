@@ -23,10 +23,10 @@ public class MyNetworkObject : MonoBehaviour
 	private void Start () 
 	{
         MyCreateObjectCommand cmd = new MyCreateObjectCommand(new Vector3Simple(transform.position.x - 5, transform.position.y, transform.position.z), 0);
-        MyDemoNetworkClient.Instance.SendNetworkMessage(JsonUtility.ToJson(cmd), (int)EMyNetworkCommand.COMMAND_OBJECT_CREATE);
+        MyDemoNetworkClient.Instance.EnqueueMessage(JsonUtility.ToJson(cmd), (int)EMyNetworkCommand.COMMAND_OBJECT_CREATE);
 
         MyRequestAllObjectsCommand cmdc = new MyRequestAllObjectsCommand(new Vector3Simple(transform.position.x, transform.position.y, transform.position.z), 0, 50);
-        MyDemoNetworkClient.Instance.SendNetworkMessage(JsonUtility.ToJson(cmdc), (int)EMyNetworkCommand.COMMAND_WORLD_GETOBJECTS);
+        MyDemoNetworkClient.Instance.EnqueueMessage(JsonUtility.ToJson(cmdc), (int)EMyNetworkCommand.COMMAND_WORLD_GETOBJECTS);
     }
 	
 	/// <summary>

@@ -9,6 +9,8 @@ namespace StylezNetwork.Commands
     {
         COMMAND_AUTH,
         COMMAND_OBJECT_CREATE,
-        COMMAND_WORLD_GETOBJECTS
+        COMMAND_WORLD_GETOBJECTS,
+        COMMAND_MOVE_OBJECT,
+        COMMAND_REQUEST_AREAUPDATE
     }
 }

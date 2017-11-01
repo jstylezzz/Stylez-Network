@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using System.Timers;
 using StylezNetwork.Commands;
 using StylezNetwork.Objects;
+using StylezNetworkDedicated.Manager;
 
 namespace StylezNetworkDedicated.Network
 {
@@ -14,6 +15,7 @@ namespace StylezNetworkDedicated.Network
     {
         public int ClientID { get; private set; }
         public Socket ClientSocket { get; private set; }
+        public MyDedicatedClientData DataInstance { get { return m_dataIstance; } }
 
         public const int SocketAliveCheckRate = 4000; //Time in milliseconds
         public const int AuthTokenLength = 5;
@@ -22,12 +24,13 @@ namespace StylezNetworkDedicated.Network
 
         private Timer m_aliveTimer;
         private MyDedicatedServerBase m_serverInstance;
-        private Dictionary<int, IMyNetworkObject> m_registeredClientObjects = new Dictionary<int, IMyNetworkObject>();
+        private MyDedicatedClientData m_dataIstance;
 
         private byte[] m_streamBuffer;
 
         public MyDedicatedServerClient(Socket s, int id, MyDedicatedServerBase sInstance)
         {
+            m_dataIstance = new MyDedicatedClientData(this);
             m_aliveTimer = new Timer(SocketAliveCheckRate);
             m_aliveTimer.Elapsed += PerformSocketAliveCheck;
 
@@ -54,10 +57,17 @@ namespace StylezNetworkDedicated.Network
 
         private void OnMessageLengthReceived(IAsyncResult ar)
         {
-            (ar.AsyncState as Socket).EndReceive(ar);
-            int len = BitConverter.ToInt32(m_streamBuffer, 0);
-            m_streamBuffer = new byte[len];
-            ClientSocket.BeginReceive(m_streamBuffer, 0, len, SocketFlags.None, new AsyncCallback(OnMessageReceived), ClientSocket);
+            try
+            {
+                (ar.AsyncState as Socket).EndReceive(ar);
+                int len = BitConverter.ToInt32(m_streamBuffer, 0);
+                m_streamBuffer = new byte[len];
+                ClientSocket.BeginReceive(m_streamBuffer, 0, len, SocketFlags.None, new AsyncCallback(OnMessageReceived), ClientSocket);
+            }
+            catch
+            {
+                Disconnect();
+            }
         }
 
         private void OnMessageReceived(IAsyncResult ar)
@@ -104,18 +114,8 @@ namespace StylezNetworkDedicated.Network
         {
             m_aliveTimer.Stop();
             ClientSocket.Shutdown(SocketShutdown.Both);
-            Program.Instance.WorldCacheInstance.RemoveAllObjectsFromPlayer(m_registeredClientObjects.Values.ToArray(), ClientID);
+            Program.Instance.WorldCacheInstance.RemoveAllObjectsFromPlayer(m_dataIstance.PlayerOwnedObjects.Values.ToArray(), ClientID);
             m_serverInstance.UnregisterClient(this);
-        }
-
-        public void RegisterPlayerWorldObject(IMyNetworkObject o)
-        {
-            m_registeredClientObjects.Add(o.ObjectNetworkID, o);
-        }
-
-        public void UnregisterPlayerWorldObject(IMyNetworkObject o)
-        {
-            m_registeredClientObjects.Remove(o.ObjectNetworkID);
         }
 
         private void PerformSocketAliveCheck(object sender, ElapsedEventArgs e)

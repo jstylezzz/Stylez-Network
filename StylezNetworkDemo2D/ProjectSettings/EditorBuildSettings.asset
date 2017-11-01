@@ -7,7 +7,7 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 1
     path: Assets/Demo.unity
-    guid: baf5450d640ed204dba4b97e67ac0ec0
+    guid: 9070ab48035b88c4cb35463deca65feb
   - enabled: 1
     path: Assets/DemoPlay.unity
-    guid: a4e0d4700c82584409289d4ec9802eb4
+    guid: 7c310a267beacdf498e93ceb685a6f1f

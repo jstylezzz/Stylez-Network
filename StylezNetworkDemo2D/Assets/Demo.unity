@@ -121,7 +121,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1691293510}
   - component: {fileID: 1691293509}
-  - component: {fileID: 1691293508}
   - component: {fileID: 1691293507}
   - component: {fileID: 1691293506}
   m_Layer: 0
@@ -139,13 +138,6 @@ AudioListener:
   m_GameObject: {fileID: 1691293505}
   m_Enabled: 1
 --- !u!124 &1691293507
-Behaviour:
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1691293505}
-  m_Enabled: 1
---- !u!92 &1691293508
 Behaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
@@ -227,11 +219,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1962503177}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d228638b118270d40ae53d5679e7af27, type: 3}
+  m_Script: {fileID: 11500000, guid: 3400efffc84d49244a6313e5a8640718, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   m_serverIP: 127.0.0.1
   m_port: 7777
+  m_streamDist: 50
 --- !u!4 &1962503179
 Transform:
   m_ObjectHideFlags: 0
@@ -253,7 +246,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1962503177}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fda2e582a6a55d74296b211704529191, type: 3}
+  m_Script: {fileID: 11500000, guid: d2df7a712b76feb4a95f7e6dca0a6170, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &1962503181
@@ -264,10 +257,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1962503177}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 08451822f9a4f184db2d3a5c636b8b9c, type: 3}
+  m_Script: {fileID: 11500000, guid: a145a2951f35b504bbac8c18a321d0bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PersistanceIdentifier: NetworkObjectPersistance
 --- !u!114 &1962503182
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -276,6 +268,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1962503177}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3bc3b422790c5864190ddce32213fc03, type: 3}
+  m_Script: {fileID: 11500000, guid: 45c9fb2bda447564580f5b28e92de8c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  PersistanceIdentifier: NetworkManagerData

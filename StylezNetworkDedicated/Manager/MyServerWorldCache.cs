@@ -11,13 +11,16 @@ namespace StylezNetworkDedicated.Manager
     public class MyServerWorldCache
     {
         private Dictionary<int, IMyNetworkObject> m_worldObjects = new Dictionary<int, IMyNetworkObject>();
+        private Dictionary<int, MyObjectMovementData> m_worldObjectMovement = new Dictionary<int, MyObjectMovementData>();
+
         private Stack<int> m_freeIndexStack = new Stack<int>();
         private int m_highestObjectID = -1;
 
         public void AddObjectToWorld(IMyNetworkObject o)
         {
             m_worldObjects.Add(o.ObjectNetworkID, o);
-            Program.Instance.ServerBaseInstance.ClientRegistry[o.OwnerClientID].RegisterPlayerWorldObject(o);
+            m_worldObjectMovement.Add(o.ObjectNetworkID, new MyObjectMovementData());
+            Program.Instance.ServerBaseInstance.ClientRegistry[o.OwnerClientID].DataInstance.RegisterPlayerWorldObject(o);
             Console.WriteLine($"[DBG]: Object added to world with ID {o.ObjectNetworkID} from client {o.OwnerClientID}.");
         }
 
@@ -26,8 +29,44 @@ namespace StylezNetworkDedicated.Manager
             int id = o.ObjectNetworkID;
             m_freeIndexStack.Push(id);
             m_worldObjects.Remove(id);
-            Program.Instance.ServerBaseInstance.ClientRegistry[o.OwnerClientID].UnregisterPlayerWorldObject(o);
+            m_worldObjectMovement.Remove(id);
+            Program.Instance.ServerBaseInstance.ClientRegistry[o.OwnerClientID].DataInstance.UnregisterPlayerWorldObject(o);
             Console.WriteLine($"[DBG]: Remove object with ID {id} with owner id {o.OwnerClientID} from the world.");
+        }
+
+        public MyObjectMovementData GetMovementData(int id)
+        {
+            return m_worldObjectMovement[id];
+        }
+
+        public double GetObjectMovementSpeed(int objectid)
+        {
+            return m_worldObjectMovement[objectid].MovementSpeed;
+        }
+
+        public EMyObjectMovementState GetObjectMovementState(int objectid)
+        {
+            return m_worldObjectMovement[objectid].MovementState;
+        }
+
+        public Vector3Simple GetObjectMovementDirection(int objectid)
+        {
+            return m_worldObjectMovement[objectid].MovementDirection;
+        }
+
+        public void UpdateObjectSpeed(int objectid, double speed)
+        {
+            m_worldObjectMovement[objectid].MovementSpeed = speed;
+        }
+
+        public void UpdateObjectMovementDirection(int objectid, Vector3Simple dir)
+        {
+            m_worldObjectMovement[objectid].MovementDirection = dir;
+        }
+
+        public void UpdateObjectMovementState(int objectid, EMyObjectMovementState state)
+        {
+            m_worldObjectMovement[objectid].MovementState = state;
         }
 
         public IMyNetworkObject GetNetworkObject(int id)
