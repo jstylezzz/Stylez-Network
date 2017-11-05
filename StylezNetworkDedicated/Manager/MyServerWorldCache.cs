@@ -34,6 +34,21 @@ namespace StylezNetworkDedicated.Manager
             Console.WriteLine($"[DBG]: Remove object with ID {id} with owner id {o.OwnerClientID} from the world.");
         }
 
+        public MyObjectInfoPackage GetObjectInfoPackage(int id)
+        {
+            return new MyObjectInfoPackage(id, m_worldObjects[id].Position, m_worldObjectMovement[id]);
+        }
+
+        public MyObjectInfoPackage[] GetNetworkObjectsInfoPackages(Vector3Simple point, int dim, double dist)
+        {
+            List<MyObjectInfoPackage> objects = new List<MyObjectInfoPackage>();
+            foreach (IMyNetworkObject o in m_worldObjects.Values)
+            {
+                if (o.Dimension == dim && Vector3Simple.Distance(o.Position, point) <= dist) objects.Add(new MyObjectInfoPackage(o.ObjectNetworkID, o.Position, m_worldObjectMovement[o.ObjectNetworkID]));
+            }
+            return objects.ToArray();
+        }
+
         public MyObjectMovementData GetMovementData(int id)
         {
             return m_worldObjectMovement[id];

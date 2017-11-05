@@ -45,12 +45,14 @@
     <Compile Include="Commands\MyAreaUpdateCommand.cs" />
     <Compile Include="Commands\MyAuthCommand.cs" />
     <Compile Include="Commands\MyCreateObjectCommand.cs" />
+    <Compile Include="Commands\MyDeleteObjectCommand.cs" />
     <Compile Include="Commands\MyMoveObjectCommand.cs" />
     <Compile Include="Commands\MyRequestAllObjectsCommand.cs" />
     <Compile Include="MathEx\Vector3Simple.cs" />
     <Compile Include="Objects\EMyObjectMovementState.cs" />
     <Compile Include="Objects\IMyNetworkObject.cs" />
     <Compile Include="Objects\MyNetworkObjectPositionData.cs" />
+    <Compile Include="Objects\MyObjectInfoPackage.cs" />
     <Compile Include="Objects\MyObjectMovementData.cs" />
     <Compile Include="Objects\MySimpleWorldObject.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

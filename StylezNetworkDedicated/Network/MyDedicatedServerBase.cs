@@ -90,6 +90,7 @@ namespace StylezNetworkDedicated.Network
             m_freeIDRegistry.Push(c.ClientID);
             m_clientRegistry.Remove(c.ClientID);
             Console.WriteLine("[LEAVE]: Client " + c.ClientID + " has left the server.");
+            GC.Collect();
         }
 
         public int GetFirstFreeClientID(bool removeOld = false)

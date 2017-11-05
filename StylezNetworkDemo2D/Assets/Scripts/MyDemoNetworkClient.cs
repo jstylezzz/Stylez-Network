@@ -81,25 +81,28 @@ public class MyDemoNetworkClient : MonoBehaviour
 
     private void ProcessSendQueue()
     {
-        Debug.Log("JAA");
-        
-            
-        List<byte[]> standardCmds = new List<byte[]>();
-        standardCmds.Add(GetMessageBytes(JsonUtility.ToJson(new MyAreaUpdateCommand(m_streamDist, 0, new Vector3Simple(transform.position.x, transform.position.y, transform.position.z))), (int)EMyNetworkCommand.COMMAND_REQUEST_AREAUPDATE));
-        int transmissionsLeft = ((m_sendQueue.Count + standardCmds.Count > TransmissionsPerSecond) ? 15 : m_sendQueue.Count + standardCmds.Count);
-
-        for (int i = 0; i < standardCmds.Count; i++)
+        try
         {
-            m_cSock.Send(standardCmds[i]);
-            transmissionsLeft--;
-        }
+            List<byte[]> standardCmds = new List<byte[]>();
+            standardCmds.Add(GetMessageBytes(JsonUtility.ToJson(new MyAreaUpdateCommand(m_streamDist, 0, new Vector3Simple(transform.position.x, transform.position.y, transform.position.z))), (int)EMyNetworkCommand.COMMAND_REQUEST_AREAUPDATE));
+            int transmissionsLeft = ((m_sendQueue.Count + standardCmds.Count > TransmissionsPerSecond) ? 15 : m_sendQueue.Count + standardCmds.Count);
 
-        for (int i = 0; i < transmissionsLeft; i++)
-        {
-            Debug.Log("JA");
-            m_cSock.Send(m_sendQueue.Dequeue());
+            for (int i = 0; i < standardCmds.Count; i++)
+            {
+                m_cSock.Send(standardCmds[i]);
+                transmissionsLeft--;
+            }
+
+            for (int i = 0; i < transmissionsLeft; i++)
+            {
+                byte[] b = m_sendQueue.Dequeue();
+                m_cSock.Send(b);
+            }
         }
-        
+        catch
+        {
+            Disconnect();
+        }
     }
 
     private void ReceiveFromBegin()
@@ -132,7 +135,7 @@ public class MyDemoNetworkClient : MonoBehaviour
         m_clientID = cid;
         m_token = token;
 
-        MyMainThreadPump.Instance().Enqueue(() => 
+        MyCrossThreadOperator.Instance.Enqueue(() => 
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
             m_sendActive = true;
@@ -167,15 +170,20 @@ public class MyDemoNetworkClient : MonoBehaviour
         return combinedBytes;
     }
 
-    public void OnApplicationQuit()
+    private void Disconnect()
     {
         if (m_cSock.Connected)
         {
             m_sendActive = false;
-            MyMainThreadPump.Instance().Enqueue(() => { StopCoroutine(m_sendRoutine); });
+            MyCrossThreadOperator.Instance.Enqueue(() => { StopCoroutine(m_sendRoutine); });
             m_cSock.Shutdown(SocketShutdown.Both);
             Debug.Log("Disconnecting from server..");
         }
+    }
+
+    public void OnApplicationQuit()
+    {
+        Disconnect();
 
     }
 }

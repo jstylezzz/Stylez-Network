@@ -53,18 +53,24 @@ namespace StylezNetworkDedicated.Manager
                 {
                     MyAreaUpdateCommand cmd = JsonConvert.DeserializeObject<MyAreaUpdateCommand>(cmdJson);
                     MyDedicatedClientData cd = Program.Instance.ServerBaseInstance.ClientRegistry[fromClient].DataInstance;
-                    IMyNetworkObject[] o = Program.Instance.WorldCacheInstance.GetNetworkObjects(cmd.StreamPoint, cmd.StreamDimension, cmd.StreamDistance);
+                    MyObjectInfoPackage[] o = Program.Instance.WorldCacheInstance.GetNetworkObjectsInfoPackages(cmd.StreamPoint, cmd.StreamDimension, cmd.StreamDistance);
                     int[] inRange = new int[o.Length];
                     Vector3Simple[] poses = new Vector3Simple[o.Length];
                     MyObjectMovementData[] mov = new MyObjectMovementData[o.Length];
                     for (int i = 0; i < inRange.Length; i++)
                     {
-                        inRange[i] = o[i].ObjectNetworkID;
-                        poses[i] = o[i].Position;
-                        mov[i] = WorldCacheInstance.GetMovementData(i);
+                        inRange[i] = o[i].ObjectID;
+                        poses[i] = o[i].ObjectPosition;
+                        mov[i] = o[i].MovementData;
                     }
                     MyAreaUpdateCommand outcmd = new MyAreaUpdateCommand(inRange, cd.UpdateObjectsInRange(inRange), poses, mov);
                     SendCommandToClient(fromClient, JsonConvert.SerializeObject(outcmd), EMyNetworkCommand.COMMAND_REQUEST_AREAUPDATE);
+                    break;
+                }
+                case EMyNetworkCommand.COMMAND_OBJECT_DELETE:
+                {
+                    MyDeleteObjectCommand cmd = JsonConvert.DeserializeObject<MyDeleteObjectCommand>(cmdJson);
+                    WorldCacheInstance.RemoveObjectFromWorld(WorldCacheInstance.GetNetworkObject(cmd.ObjectID));
                     break;
                 }
             }

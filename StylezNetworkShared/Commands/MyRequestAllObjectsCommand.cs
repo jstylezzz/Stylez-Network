@@ -10,6 +10,7 @@ namespace StylezNetwork.Commands
     [Serializable]
     public class MyRequestAllObjectsCommand
     {
+        public int[] WorldObjectIDs; //ID's of the objects
         public Vector3Simple[] WorldObjectLocations; //Objects to create clientside
         public Vector3Simple LoadingPoint; //Position to look for serverside
         public int LoadingDimension; //Dimension to look in serverside
@@ -22,12 +23,15 @@ namespace StylezNetwork.Commands
 
         public MyRequestAllObjectsCommand(IMyNetworkObject[] objectsToSend)
         {
-            List<Vector3Simple> locs = new List<Vector3Simple>();
-            foreach(IMyNetworkObject o in objectsToSend)
+            int[] ids = new int[objectsToSend.Length];
+            Vector3Simple[] locs = new Vector3Simple[objectsToSend.Length];
+            for (int i = 0; i < objectsToSend.Length; i++)
             {
-                locs.Add(o.Position);
+                ids[i] = objectsToSend[i].ObjectNetworkID;
+                locs[i] = objectsToSend[i].Position;
             }
-            WorldObjectLocations = locs.ToArray();
+            WorldObjectLocations = locs;
+            WorldObjectIDs = ids;
         }
 
         public MyRequestAllObjectsCommand(Vector3Simple loadpoint, int loadDimension, double loadDistance)

@@ -16,6 +16,7 @@ namespace StylezNetworkDedicated.Network
         public int ClientID { get; private set; }
         public Socket ClientSocket { get; private set; }
         public MyDedicatedClientData DataInstance { get { return m_dataIstance; } }
+        public bool ShuttingDown { get; private set; }
 
         public const int SocketAliveCheckRate = 4000; //Time in milliseconds
         public const int AuthTokenLength = 5;
@@ -51,6 +52,7 @@ namespace StylezNetworkDedicated.Network
 
         private void StartReceiving()
         {
+            if (ShuttingDown == true) return;
             m_streamBuffer = new byte[4];
             ClientSocket.BeginReceive(m_streamBuffer, 0, 4, SocketFlags.None, new AsyncCallback(OnMessageLengthReceived), ClientSocket);
         }
@@ -72,8 +74,10 @@ namespace StylezNetworkDedicated.Network
 
         private void OnMessageReceived(IAsyncResult ar)
         {
-            try
+            if (m_streamBuffer.Length > 0)
             {
+                //try
+                // {
                 byte[] cmdIdBytes = new byte[4];
                 byte[] commandBytes = new byte[m_streamBuffer.Length - 4];
                 Buffer.BlockCopy(m_streamBuffer, 0, cmdIdBytes, 0, 4);
@@ -82,11 +86,13 @@ namespace StylezNetworkDedicated.Network
                 string command = Encoding.ASCII.GetString(commandBytes);
                 Program.Instance.CommandProcessorInstance.ProcessCommand(cmdID, command, ClientID);
                 StartReceiving();
+                //  }
+                //  catch
+                //   {
+                //      Disconnect();
+                //   }
             }
-            catch
-            {
-                Disconnect();
-            }
+            else StartReceiving();
         }
 
         public void GenerateAuthToken()
@@ -112,6 +118,8 @@ namespace StylezNetworkDedicated.Network
 
         public void Disconnect()
         {
+            if (ShuttingDown == true) return;
+            ShuttingDown = true;
             m_aliveTimer.Stop();
             ClientSocket.Shutdown(SocketShutdown.Both);
             Program.Instance.WorldCacheInstance.RemoveAllObjectsFromPlayer(m_dataIstance.PlayerOwnedObjects.Values.ToArray(), ClientID);

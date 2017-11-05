@@ -10,25 +10,40 @@ using System.Collections.Generic;
 using UnityEngine;
 using StylezNetwork.Commands;
 using StylezNetwork.MathEx;
+using StylezNetwork.Objects;
 
 /// <summary>
 ///
 /// </summary>
-public class MyNetworkObject : MonoBehaviour 
+public class MyNetworkObject : MonoBehaviour
 {
+    public int ObjectID { get; private set; }
+    public Vector3 Position { get { return transform.position; } }
+    public int Dimension { get; private set; }
+
+    private MyWorldObjectManager m_worldMan;
 
 	/// <summary>
 	/// Script entry point.
 	/// </summary>
 	private void Start () 
 	{
-        MyCreateObjectCommand cmd = new MyCreateObjectCommand(new Vector3Simple(transform.position.x - 5, transform.position.y, transform.position.z), 0);
-        MyDemoNetworkClient.Instance.EnqueueMessage(JsonUtility.ToJson(cmd), (int)EMyNetworkCommand.COMMAND_OBJECT_CREATE);
+        
+    }
 
-        MyRequestAllObjectsCommand cmdc = new MyRequestAllObjectsCommand(new Vector3Simple(transform.position.x, transform.position.y, transform.position.z), 0, 50);
-        MyDemoNetworkClient.Instance.EnqueueMessage(JsonUtility.ToJson(cmdc), (int)EMyNetworkCommand.COMMAND_WORLD_GETOBJECTS);
+    public void SetupNetworkObject(int id, int dimension)
+    {
+        m_worldMan = MyWorldObjectManager.Instance;
+        this.ObjectID = id;
+        this.Dimension = dimension;
+        m_worldMan.RegisterObject(this);
     }
 	
+    public void UpdatePosition(Vector3 newPosition)
+    {
+        transform.position = newPosition;
+    }
+
 	/// <summary>
 	/// Script update look.
 	/// </summary>
@@ -39,6 +54,6 @@ public class MyNetworkObject : MonoBehaviour
 
     private void OnDestroy()
     {
-        
+        m_worldMan.UnregisterWorldObject(this);   
     }
 }

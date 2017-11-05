@@ -41,14 +41,51 @@ public class MyDemoCommandProcessor : MonoBehaviour
             case EMyNetworkCommand.COMMAND_WORLD_GETOBJECTS:
             {
                 MyRequestAllObjectsCommand cmd = JsonUtility.FromJson<MyRequestAllObjectsCommand>(cmdJson);
-                for (int i = 0; i < cmd.WorldObjectLocations.Length; i++)
+                if (cmd.WorldObjectLocations.Length > 0)
                 {
-                    
-                    MyMainThreadPump.Instance().Enqueue(() =>
+                    MyThreadedCreateObject co;
+                    for (int i = 0; i < cmd.WorldObjectLocations.Length; i++)
                     {
-                        GameObject g = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                        g.transform.position = new Vector3((float)cmd.WorldObjectLocations[0].x, (float)cmd.WorldObjectLocations[0].y, (float)cmd.WorldObjectLocations[0].z);
-                    });
+                        co = new MyThreadedCreateObject(cmd.WorldObjectIDs[i], new Vector3((float)cmd.WorldObjectLocations[i].x, (float)cmd.WorldObjectLocations[i].y, (float)cmd.WorldObjectLocations[i].z));
+                        MyCrossThreadOperator.Instance.Enqueue(co);
+                    }
+                }
+                break;
+            }
+            case EMyNetworkCommand.COMMAND_REQUEST_AREAUPDATE:
+            {
+                MyAreaUpdateCommand cmd = JsonUtility.FromJson<MyAreaUpdateCommand>(cmdJson);
+                if (cmd.ObjectsNoLongerInRange == null) Debug.Log("No objects have streamed out.");
+                else
+                {
+                    MyWorldObjectManager oman = MyWorldObjectManager.Instance;
+                    int currentID;
+                    MyNetworkObject currentObject;
+
+                    for (int i = 0; i < cmd.ObjectsNoLongerInRange.Length; i++)
+                    {
+                        currentID = cmd.ObjectsNoLongerInRange[i];
+                        Debug.Log("Object with ID " + currentID + " was streamed out.");
+                        MyThreadedDeleteObject del = new MyThreadedDeleteObject(currentID, MyThreadedDeleteObject.EMyDeleteType.FROMREMOTE);
+                        MyCrossThreadOperator.Instance.Enqueue(del);
+                    }
+                    
+                    for (int i = 0; i < cmd.ObjectIDsInRange.Length; i++)
+                    {
+                        currentID = cmd.ObjectIDsInRange[i];
+
+                        if (oman.NetObjectRegistry.TryGetValue(currentID, out currentObject)) //Object exists, update position
+                        {
+                            Vector3 newPos = new Vector3((float)cmd.ObjectPositions[i].x, (float)cmd.ObjectPositions[i].y, (float)cmd.ObjectPositions[i].z);
+                            MyThreadedMoveObject mo = new MyThreadedMoveObject(currentObject, newPos);
+                            MyCrossThreadOperator.Instance.Enqueue(mo);
+                        }
+                        else //Object does not exist, create it
+                        {
+                            MyThreadedCreateObject co = new MyThreadedCreateObject(currentID, new Vector3((float)cmd.ObjectPositions[i].x, (float)cmd.ObjectPositions[i].y, (float)cmd.ObjectPositions[i].z));
+                            MyCrossThreadOperator.Instance.Enqueue(co);
+                        }
+                    }
                 }
                 break;
             }

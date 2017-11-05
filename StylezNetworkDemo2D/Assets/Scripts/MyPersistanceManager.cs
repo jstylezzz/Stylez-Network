@@ -14,6 +14,7 @@ public class MyPersistanceManager : MonoBehaviour
 
     private void Awake()
     {
+        Application.runInBackground = true;
         MyPersistanceManager[] m = FindObjectsOfType<MyPersistanceManager>();
         for (int i = 0; i < m.Length; i++)
         {
