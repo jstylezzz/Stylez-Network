@@ -22,7 +22,7 @@ using System.Collections;
 public class MyDemoNetworkClient : MonoBehaviour
 {
     public static MyDemoNetworkClient Instance { get; private set; }
-    public const int TransmissionsPerSecond = 15;
+    public const int TransmissionPerQuarterSecond = 4;
 
     [SerializeField]
     private string m_serverIP;
@@ -74,7 +74,7 @@ public class MyDemoNetworkClient : MonoBehaviour
 
     private IEnumerator SendRoutine()
     {   
-        yield return new WaitForSeconds(1);
+        yield return new WaitForSeconds(0.25f);
         ProcessSendQueue();
         if (m_sendActive) m_sendRoutine = StartCoroutine(SendRoutine());
     }
@@ -85,7 +85,7 @@ public class MyDemoNetworkClient : MonoBehaviour
         {
             List<byte[]> standardCmds = new List<byte[]>();
             standardCmds.Add(GetMessageBytes(JsonUtility.ToJson(new MyAreaUpdateCommand(m_streamDist, 0, new Vector3Simple(transform.position.x, transform.position.y, transform.position.z))), (int)EMyNetworkCommand.COMMAND_REQUEST_AREAUPDATE));
-            int transmissionsLeft = ((m_sendQueue.Count + standardCmds.Count > TransmissionsPerSecond) ? 15 : m_sendQueue.Count + standardCmds.Count);
+            int transmissionsLeft = ((m_sendQueue.Count + standardCmds.Count > TransmissionPerQuarterSecond) ? TransmissionPerQuarterSecond : m_sendQueue.Count + standardCmds.Count);
 
             for (int i = 0; i < standardCmds.Count; i++)
             {
