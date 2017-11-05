@@ -11,5 +11,16 @@ namespace StylezNetwork.Commands
     {
         public MyObjectMovementData MovementData;
         public int ObjectID;
+
+        public MyMoveObjectCommand()
+        {
+            //Empty json constructor
+        }
+
+        public MyMoveObjectCommand(MyObjectMovementData moveData, int id)
+        {
+            MovementData = moveData;
+            ObjectID = id;
+        }
     }
 }

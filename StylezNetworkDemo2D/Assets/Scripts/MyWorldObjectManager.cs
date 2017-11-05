@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using StylezNetwork.Commands;
 using StylezNetwork.MathEx;
-
+using StylezNetwork.Objects;
 /// <summary>
 ///
 /// </summary>
@@ -41,9 +41,9 @@ public class MyWorldObjectManager : MonoBehaviour
         m_objectRegistry.Remove(o.ObjectID);
     }
 
-    public static void CreateObject(Vector3 position, int dimension)
+    public static void CreateObject(Vector3 position, int dimension, EMyObjectType otype)
     {
-        MyCreateObjectCommand cmd = new MyCreateObjectCommand(new Vector3Simple(position.x, position.y, position.z), dimension);
+        MyCreateObjectCommand cmd = new MyCreateObjectCommand(new Vector3Simple(position.x, position.y, position.z), dimension, MyDemoNetworkClient.Instance.ClientID, otype);
         MyDemoNetworkClient.Instance.EnqueueMessage(JsonUtility.ToJson(cmd), (int)EMyNetworkCommand.COMMAND_OBJECT_CREATE);
     }
 

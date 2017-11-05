@@ -46,7 +46,7 @@ public class MyDemoCommandProcessor : MonoBehaviour
                     MyThreadedCreateObject co;
                     for (int i = 0; i < cmd.WorldObjectLocations.Length; i++)
                     {
-                        co = new MyThreadedCreateObject(cmd.WorldObjectIDs[i], new Vector3((float)cmd.WorldObjectLocations[i].x, (float)cmd.WorldObjectLocations[i].y, (float)cmd.WorldObjectLocations[i].z));
+                        co = new MyThreadedCreateObject(new MySimpleWorldObject(cmd.WorldObjectLocations[i], 0, cmd.WorldObjectIDs[i], cmd.WorldObjectOwners[i], cmd.ObjectTypes[i]));
                         MyCrossThreadOperator.Instance.Enqueue(co);
                     }
                 }
@@ -61,6 +61,7 @@ public class MyDemoCommandProcessor : MonoBehaviour
                     MyWorldObjectManager oman = MyWorldObjectManager.Instance;
                     int currentID;
                     MyNetworkObject currentObject;
+                    MyObjectMovementData curMoveData;
 
                     for (int i = 0; i < cmd.ObjectsNoLongerInRange.Length; i++)
                     {
@@ -73,16 +74,16 @@ public class MyDemoCommandProcessor : MonoBehaviour
                     for (int i = 0; i < cmd.ObjectIDsInRange.Length; i++)
                     {
                         currentID = cmd.ObjectIDsInRange[i];
-
+                        curMoveData = cmd.ObjectMovement[i];
                         if (oman.NetObjectRegistry.TryGetValue(currentID, out currentObject)) //Object exists, update position
                         {
                             Vector3 newPos = new Vector3((float)cmd.ObjectPositions[i].x, (float)cmd.ObjectPositions[i].y, (float)cmd.ObjectPositions[i].z);
-                            MyThreadedMoveObject mo = new MyThreadedMoveObject(currentObject, newPos);
+                            MyThreadedMoveObject mo = new MyThreadedMoveObject(currentObject, curMoveData, MyThreadedMoveObject.EMyThreadedMoveUpdate.UPDATE_MOV);
                             MyCrossThreadOperator.Instance.Enqueue(mo);
                         }
                         else //Object does not exist, create it
                         {
-                            MyThreadedCreateObject co = new MyThreadedCreateObject(currentID, new Vector3((float)cmd.ObjectPositions[i].x, (float)cmd.ObjectPositions[i].y, (float)cmd.ObjectPositions[i].z));
+                            MyThreadedCreateObject co = new MyThreadedCreateObject(new MySimpleWorldObject(cmd.ObjectPositions[i], 0, cmd.ObjectIDsInRange[i], cmd.ObjectOwners[i], cmd.ObjectType[i]));
                             MyCrossThreadOperator.Instance.Enqueue(co);
                         }
                     }

@@ -54,7 +54,7 @@ namespace StylezNetworkDedicated.Network
         {
             if (ShuttingDown == true) return;
             m_streamBuffer = new byte[4];
-            ClientSocket.BeginReceive(m_streamBuffer, 0, 4, SocketFlags.None, new AsyncCallback(OnMessageLengthReceived), ClientSocket);
+            if(ClientSocket.Connected) ClientSocket.BeginReceive(m_streamBuffer, 0, 4, SocketFlags.None, new AsyncCallback(OnMessageLengthReceived), ClientSocket);
         }
 
         private void OnMessageLengthReceived(IAsyncResult ar)

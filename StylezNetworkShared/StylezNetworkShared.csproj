@@ -50,6 +50,7 @@
     <Compile Include="Commands\MyRequestAllObjectsCommand.cs" />
     <Compile Include="MathEx\Vector3Simple.cs" />
     <Compile Include="Objects\EMyObjectMovementState.cs" />
+    <Compile Include="Objects\EMyObjectType.cs" />
     <Compile Include="Objects\IMyNetworkObject.cs" />
     <Compile Include="Objects\MyNetworkObjectPositionData.cs" />
     <Compile Include="Objects\MyObjectInfoPackage.cs" />

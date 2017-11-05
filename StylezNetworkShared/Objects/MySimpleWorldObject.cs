@@ -16,12 +16,15 @@ namespace StylezNetwork.Objects
 
         public int ObjectNetworkID { get; private set; }
 
-        public MySimpleWorldObject(Vector3Simple pos, int dim, int networkID, int clientID)
+        public EMyObjectType ObjectType { get; private set; }
+
+        public MySimpleWorldObject(Vector3Simple pos, int dim, int networkID, int clientID, EMyObjectType t)
         {
             Position = pos;
             Dimension = dim;
             OwnerClientID = clientID;
             ObjectNetworkID = networkID;
+            ObjectType = t;
         }
 
         public void UpdateDimension(int dim)

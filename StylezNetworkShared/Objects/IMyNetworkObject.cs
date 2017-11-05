@@ -12,6 +12,7 @@ namespace StylezNetwork.Objects
         int Dimension { get; }
         int OwnerClientID { get; }
         int ObjectNetworkID { get; }
+        EMyObjectType ObjectType { get; }
 
         void UpdatePosition(Vector3Simple newPosition);
         void UpdateDimension(int dim);

@@ -29,7 +29,7 @@ namespace StylezNetworkDedicated.Manager
                 case EMyNetworkCommand.COMMAND_OBJECT_CREATE:
                 {
                     MyCreateObjectCommand cmd = JsonConvert.DeserializeObject<MyCreateObjectCommand>(cmdJson);
-                    Program.Instance.WorldCacheInstance.AddObjectToWorld(new MySimpleWorldObject(cmd.AtPosition, cmd.InDimension, Program.Instance.WorldCacheInstance.GetFirstFreeObjectID(true), fromClient));
+                    Program.Instance.WorldCacheInstance.AddObjectToWorld(new MySimpleWorldObject(cmd.AtPosition, cmd.InDimension, Program.Instance.WorldCacheInstance.GetFirstFreeObjectID(true), fromClient, cmd.ObjectType));
                     break;
                 }
                 case EMyNetworkCommand.COMMAND_WORLD_GETOBJECTS:
@@ -57,13 +57,18 @@ namespace StylezNetworkDedicated.Manager
                     int[] inRange = new int[o.Length];
                     Vector3Simple[] poses = new Vector3Simple[o.Length];
                     MyObjectMovementData[] mov = new MyObjectMovementData[o.Length];
+                    EMyObjectType[] types = new EMyObjectType[o.Length];
+                    int[] owners = new int[o.Length];
+
                     for (int i = 0; i < inRange.Length; i++)
                     {
                         inRange[i] = o[i].ObjectID;
                         poses[i] = o[i].ObjectPosition;
                         mov[i] = o[i].MovementData;
+                        types[i] = o[i].ObjectType;
+                        owners[i] = o[i].OwnerID;
                     }
-                    MyAreaUpdateCommand outcmd = new MyAreaUpdateCommand(inRange, cd.UpdateObjectsInRange(inRange), poses, mov);
+                    MyAreaUpdateCommand outcmd = new MyAreaUpdateCommand(inRange, cd.UpdateObjectsInRange(inRange), poses, mov, types, owners);
                     SendCommandToClient(fromClient, JsonConvert.SerializeObject(outcmd), EMyNetworkCommand.COMMAND_REQUEST_AREAUPDATE);
                     break;
                 }

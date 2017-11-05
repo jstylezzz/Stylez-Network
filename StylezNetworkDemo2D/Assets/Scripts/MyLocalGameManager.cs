@@ -22,6 +22,6 @@ public class MyLocalGameManager : MonoBehaviour
 	private void Start () 
 	{
         m_oman = MyWorldObjectManager.Instance;
-        MyWorldObjectManager.CreateObject(new Vector3(Random.Range(-5, 5), Random.Range(-5, 5), 0), 0);
+        MyWorldObjectManager.CreateObject(Vector3.zero, 0, StylezNetwork.Objects.EMyObjectType.OBJECT_PLAYER);
 	}
 }

@@ -9,6 +9,7 @@ namespace StylezNetwork.Objects
     {
         MOVEMENT_STOP,
         MOVEMENT_START,
-        MOVEMENT_UPDATE
+        MOVEMENT_NONE,
+        MOVEMENT_POSITION_UPDATE
     }
 }

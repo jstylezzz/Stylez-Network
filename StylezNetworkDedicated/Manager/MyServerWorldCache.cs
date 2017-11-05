@@ -36,7 +36,7 @@ namespace StylezNetworkDedicated.Manager
 
         public MyObjectInfoPackage GetObjectInfoPackage(int id)
         {
-            return new MyObjectInfoPackage(id, m_worldObjects[id].Position, m_worldObjectMovement[id]);
+            return new MyObjectInfoPackage(id, m_worldObjects[id].Position, m_worldObjectMovement[id], m_worldObjects[id].ObjectType, m_worldObjects[id].OwnerClientID);
         }
 
         public MyObjectInfoPackage[] GetNetworkObjectsInfoPackages(Vector3Simple point, int dim, double dist)
@@ -44,7 +44,7 @@ namespace StylezNetworkDedicated.Manager
             List<MyObjectInfoPackage> objects = new List<MyObjectInfoPackage>();
             foreach (IMyNetworkObject o in m_worldObjects.Values)
             {
-                if (o.Dimension == dim && Vector3Simple.Distance(o.Position, point) <= dist) objects.Add(new MyObjectInfoPackage(o.ObjectNetworkID, o.Position, m_worldObjectMovement[o.ObjectNetworkID]));
+                if (o.Dimension == dim && Vector3Simple.Distance(o.Position, point) <= dist) objects.Add(new MyObjectInfoPackage(o.ObjectNetworkID, o.Position, m_worldObjectMovement[o.ObjectNetworkID], m_worldObjects[o.ObjectNetworkID].ObjectType, m_worldObjects[o.ObjectNetworkID].OwnerClientID));
             }
             return objects.ToArray();
         }

@@ -8,26 +8,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using StylezNetwork.Objects;
 
 /// <summary>
 ///
 /// </summary>
 public class MyThreadedCreateObject : IMyCTOperation
 {
-    public int ObjectID { get; private set; }
-    public Vector3 InstantiatePos { get; private set; }
+    public MySimpleWorldObject ObjectData { get; private set; }
 
-    public MyThreadedCreateObject(int id, Vector3 pos)
+    public MyThreadedCreateObject(MySimpleWorldObject o)
     {
-        this.ObjectID = id;
-        this.InstantiatePos = pos;
+        ObjectData = o;
     }
     
     public void Execute()
     {
-        GameObject g = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        GameObject g;
+
+        if (ObjectData.ObjectType == EMyObjectType.OBJECT_PLAYER)
+        {
+            //It's our player
+            if (ObjectData.OwnerClientID == MyDemoNetworkClient.Instance.ClientID) g = GameObject.Instantiate(Resources.Load<GameObject>(@"Prefabs\Player_Local"));
+            else g = GameObject.Instantiate(Resources.Load<GameObject>(@"Prefabs\Player_Remote"));
+        }
+        else g = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+
         MyNetworkObject nwo = g.AddComponent<MyNetworkObject>();
-        nwo.UpdatePosition(InstantiatePos);
-        nwo.SetupNetworkObject(this.ObjectID, 0);
+        nwo.RemoteUpdatePosition(new Vector3((float)ObjectData.Position.x, (float)ObjectData.Position.y, (float)ObjectData.Position.z));
+        nwo.SetupNetworkObject(ObjectData.ObjectNetworkID, 0);
     }
 }

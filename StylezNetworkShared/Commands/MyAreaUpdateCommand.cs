@@ -14,6 +14,8 @@ namespace StylezNetwork.Commands
         public int[] ObjectsNoLongerInRange;
         public Vector3Simple[] ObjectPositions;
         public MyObjectMovementData[] ObjectMovement;
+        public EMyObjectType[] ObjectType;
+        public int[] ObjectOwners;
         public double StreamDistance;
         public Vector3Simple StreamPoint;
         public int StreamDimension;
@@ -30,12 +32,14 @@ namespace StylezNetwork.Commands
             StreamDimension = dim;
         }
 
-        public MyAreaUpdateCommand(int[] objsInRange, int[] objsNoLongerInRange, Vector3Simple[] objPoses, MyObjectMovementData[] objsMovs)
+        public MyAreaUpdateCommand(int[] objsInRange, int[] objsNoLongerInRange, Vector3Simple[] objPoses, MyObjectMovementData[] objsMovs, EMyObjectType[] types, int[] owners)
         {
             ObjectIDsInRange = objsInRange;
             ObjectsNoLongerInRange = objsNoLongerInRange;
             ObjectPositions = objPoses;
             ObjectMovement = objsMovs;
+            ObjectType = types;
+            ObjectOwners = owners;
         }
     }
 }
