@@ -22,7 +22,7 @@ using System.Collections;
 public class MyDemoNetworkClient : MonoBehaviour
 {
     public static MyDemoNetworkClient Instance { get; private set; }
-    public const int TransmissionPerQuarterSecond = 4;
+    public const int TransmissionPerQuarterSecond = 15;
     public int ClientID { get { return m_clientID; } }
 
     [SerializeField]

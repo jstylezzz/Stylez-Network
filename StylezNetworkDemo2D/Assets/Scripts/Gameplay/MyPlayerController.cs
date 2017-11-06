@@ -19,6 +19,7 @@ public class MyPlayerController : MonoBehaviour
 
     private MyNetworkObject m_netObject;
     private Vector2 m_move = Vector2.zero;
+   
 
 	/// <summary>
 	/// Script entry point.
@@ -37,6 +38,7 @@ public class MyPlayerController : MonoBehaviour
         if (m_netObject == null) m_netObject = GetComponent<MyNetworkObject>();
         if(m_netObject != null)
         {
+            if (m_netObject.UnderLocalControl == false) m_netObject.UnderLocalControl = true;
             Vector2 beforeProcess = m_move;
 
             if (Input.GetKeyDown(KeyCode.W)) m_move += Vector2.up;
@@ -56,6 +58,7 @@ public class MyPlayerController : MonoBehaviour
             {
                 if (m_move == Vector2.zero) m_netObject.StopMove();
                 else m_netObject.StartMove(m_move, m_speed);
+                m_netObject.UpdateDirection(m_move);
             }
         }
 	}

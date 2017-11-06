@@ -44,9 +44,7 @@ namespace StylezNetworkDedicated.Manager
                 {
                     MyMoveObjectCommand cmd = JsonConvert.DeserializeObject<MyMoveObjectCommand>(cmdJson);
                     MyServerWorldCache c = Program.Instance.WorldCacheInstance;
-                    c.UpdateObjectMovementDirection(cmd.ObjectID, cmd.MovementData.MovementDirection);
-                    c.UpdateObjectMovementState(cmd.ObjectID, cmd.MovementData.MovementState);
-                    c.UpdateObjectSpeed(cmd.ObjectID, cmd.MovementData.MovementSpeed);
+                    c.UpdateMoveData(cmd.ObjectID, cmd.MovementData);
                     break;
                 }
                 case EMyNetworkCommand.COMMAND_REQUEST_AREAUPDATE:

@@ -79,6 +79,11 @@ namespace StylezNetworkDedicated.Manager
             m_worldObjectMovement[objectid].MovementDirection = dir;
         }
 
+        public void UpdateMoveData(int objectid, MyObjectMovementData md)
+        {
+            m_worldObjectMovement[objectid] = md;
+        }
+
         public void UpdateObjectMovementState(int objectid, EMyObjectMovementState state)
         {
             m_worldObjectMovement[objectid].MovementState = state;

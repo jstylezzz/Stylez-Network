@@ -13,13 +13,14 @@ namespace StylezNetwork.Objects
         public double MovementSpeed = 0d;
         public EMyObjectMovementState MovementState = EMyObjectMovementState.MOVEMENT_NONE;
         public Vector3Simple CurrentLocation;
+        public Vector3Simple StartStopLocation;
 
         public MyObjectMovementData()
         {
             //Json constructor, empty
         }
 
-        public MyObjectMovementData(Vector3Simple location, Vector3Simple direction, double speed, EMyObjectMovementState movestate)
+        public MyObjectMovementData(Vector3Simple location, Vector3Simple direction, double speed, EMyObjectMovementState movestate, Vector3Simple startstop)
         {
             MovementDirection = direction;
             CurrentLocation = location;
