@@ -33,9 +33,8 @@ public class MyNetworkObject : MonoBehaviour
     public bool StopSent { get; private set; } = false;
 
     private bool m_lerping = false;
-    private Vector3 m_lerpStart;
     private float m_lerpStartTime;
-   
+    private float m_lerpLen;
 
     private MyWorldObjectManager m_worldMan;
 
@@ -123,10 +122,6 @@ public class MyNetworkObject : MonoBehaviour
             LastNetworkLocation = new Vector3((float)md.CurrentLocation.x, (float)md.CurrentLocation.y, (float)md.CurrentLocation.z);
             Speed = md.MovementSpeed;
         }
-        else if (md.MovementState == EMyObjectMovementState.MOVEMENT_UPDATE && !IsMoving && !MoveObject)
-        {
-            StartMove(new Vector3((float)md.CurrentLocation.x, (float)md.CurrentLocation.y, (float)md.CurrentLocation.z), md.MovementSpeed);
-        }
         else if (md.MovementState == EMyObjectMovementState.MOVEMENT_POSITION_UPDATE) transform.position = new Vector3((float)md.CurrentLocation.x, (float)md.CurrentLocation.y, (float)md.CurrentLocation.z);
     }
 
@@ -161,7 +156,6 @@ public class MyNetworkObject : MonoBehaviour
                 IsMoving = true;
                 HasChanged = true;
                 if (UnderLocalControl) MovementStartedAt = transform.position;
-                //else transform.position = MovementStoppedAt;
                 if (!StartSent && UnderLocalControl) SendStartMoveCommand();
             }
             transform.Translate((MoveDirection * (float)Speed) * Time.deltaTime);
@@ -169,13 +163,30 @@ public class MyNetworkObject : MonoBehaviour
         else if (!MoveObject && IsMoving)
         {
             IsMoving = false;
-            if (UnderLocalControl) MovementStoppedAt = transform.position;
-            else transform.position = MovementStoppedAt;
+            if (UnderLocalControl)
+            {
+                MovementStoppedAt = transform.position;
+            }
+            else if(!UnderLocalControl)
+            {
+                m_lerping = true;
+                m_lerpStartTime = Time.time;
+                m_lerpLen = Vector3.Distance(transform.position, MovementStoppedAt);
+            }
+
             HasChanged = true;
             if (!StopSent && UnderLocalControl) SendStopMoveCommand();
-
+            
         }
-	}
+
+        if (m_lerping)
+        {
+            float dc = (((MyDemoNetworkClient.Instance.Ping / 1000) + Time.time - m_lerpStartTime)) * (float)Speed;
+            float fj = dc / m_lerpLen;
+            transform.position = Vector3.Lerp(transform.position, MovementStoppedAt, fj);
+            if (fj >= 1f) m_lerping = false;
+        }
+    }
 
     private void OnDestroy()
     {
