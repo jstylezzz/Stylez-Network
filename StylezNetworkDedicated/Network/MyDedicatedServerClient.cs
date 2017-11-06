@@ -105,6 +105,7 @@ namespace StylezNetworkDedicated.Network
 
         public void SendMessage(string text, int commandid)
         {
+            if (text == null) text = "";
             byte[] cmdId = BitConverter.GetBytes(commandid); //4 bytes
             byte[] len = BitConverter.GetBytes(text.Length + cmdId.Length); //4 bytes
 

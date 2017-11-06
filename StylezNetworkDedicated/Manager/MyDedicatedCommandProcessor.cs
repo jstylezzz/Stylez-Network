@@ -76,6 +76,11 @@ namespace StylezNetworkDedicated.Manager
                     WorldCacheInstance.RemoveObjectFromWorld(WorldCacheInstance.GetNetworkObject(cmd.ObjectID));
                     break;
                 }
+                case EMyNetworkCommand.COMMAND_PING:
+                {
+                    Program.Instance.ServerBaseInstance.ClientRegistry[fromClient].SendMessage(null, (int)EMyNetworkCommand.COMMAND_PING);
+                    break;
+                }
             }
         }
 

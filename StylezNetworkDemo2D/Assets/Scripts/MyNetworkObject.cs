@@ -31,6 +31,10 @@ public class MyNetworkObject : MonoBehaviour
     public bool UnderLocalControl { get; set; } = false;
     public bool StartSent { get; private set; } = false;
     public bool StopSent { get; private set; } = false;
+
+    private bool m_lerping = false;
+    private Vector3 m_lerpStart;
+    private float m_lerpStartTime;
    
 
     private MyWorldObjectManager m_worldMan;
@@ -151,6 +155,7 @@ public class MyNetworkObject : MonoBehaviour
 	{
         if (MoveObject)
         {
+            if (m_lerping) m_lerping = false;
             if (!IsMoving)
             {
                 IsMoving = true;
@@ -160,10 +165,6 @@ public class MyNetworkObject : MonoBehaviour
                 if (!StartSent && UnderLocalControl) SendStartMoveCommand();
             }
             transform.Translate((MoveDirection * (float)Speed) * Time.deltaTime);
-            if (!UnderLocalControl)
-            {
-                //if (Vector3.Distance(transform.position, LastNetworkLocation) > 0.5f) transform.position = LastNetworkLocation;
-            }
         }
         else if (!MoveObject && IsMoving)
         {
@@ -172,6 +173,7 @@ public class MyNetworkObject : MonoBehaviour
             else transform.position = MovementStoppedAt;
             HasChanged = true;
             if (!StopSent && UnderLocalControl) SendStopMoveCommand();
+
         }
 	}
 

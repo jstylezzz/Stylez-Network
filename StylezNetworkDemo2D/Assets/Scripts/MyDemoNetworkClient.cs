@@ -21,9 +21,15 @@ using System.Collections;
 /// </summary>
 public class MyDemoNetworkClient : MonoBehaviour
 {
+    public delegate void FramePingUpdatedDelegate(int pingFrames, int pingMs);
+
     public static MyDemoNetworkClient Instance { get; private set; }
     public const int TransmissionPerQuarterSecond = 55;
     public int ClientID { get { return m_clientID; } }
+    public int FramePing { get; private set; }
+    public int Ping { get; private set; }
+
+    public event FramePingUpdatedDelegate OnFramePingUpdated;
 
     [SerializeField]
     private string m_serverIP;
@@ -49,6 +55,11 @@ public class MyDemoNetworkClient : MonoBehaviour
     private bool m_sendActive = false;
     private Coroutine m_sendRoutine;
 
+    private bool m_waitingForPing = false;
+    private int m_framesSincePing = 0;
+    private int m_messageBatch = 0;
+    private float m_pingMs = 0;
+
     /// <summary>
     /// Script entry point.
     /// </summary>
@@ -73,9 +84,29 @@ public class MyDemoNetworkClient : MonoBehaviour
         else Debug.LogError("Could not parse the server IP. " + gameObject.name);
     }
 
+    public void OnPingReceived()
+    {
+        MyCrossThreadOperator.Instance.Enqueue(() =>
+        {
+            m_waitingForPing = false;
+            FramePing = m_framesSincePing;
+            Ping = Mathf.RoundToInt(m_pingMs);
+            m_framesSincePing = 0;
+            m_pingMs = 0f;
+            OnFramePingUpdated?.Invoke(FramePing, Ping);
+        });
+    }
+
+    public byte[] SendPingPacket()
+    {
+        m_waitingForPing = true;
+        return GetMessageBytes(null, (int)EMyNetworkCommand.COMMAND_PING);
+    }
+
     private IEnumerator SendRoutine()
     {   
         yield return new WaitForSeconds(0.25f);
+        if (m_messageBatch == 4) m_messageBatch = 0;
         ProcessSendQueue();
         if (m_sendActive) m_sendRoutine = StartCoroutine(SendRoutine());
     }
@@ -86,6 +117,7 @@ public class MyDemoNetworkClient : MonoBehaviour
         {
             List<byte[]> standardCmds = new List<byte[]>();
             standardCmds.Add(GetMessageBytes(JsonUtility.ToJson(new MyAreaUpdateCommand(m_streamDist, 0, new Vector3Simple(transform.position.x, transform.position.y, transform.position.z))), (int)EMyNetworkCommand.COMMAND_REQUEST_AREAUPDATE));
+            if (m_messageBatch == 1) standardCmds.Add(SendPingPacket());
             int transmissionsLeft = ((m_sendQueue.Count + standardCmds.Count > TransmissionPerQuarterSecond) ? TransmissionPerQuarterSecond : m_sendQueue.Count + standardCmds.Count);
 
             for (int i = 0; i < standardCmds.Count; i++)
@@ -99,10 +131,20 @@ public class MyDemoNetworkClient : MonoBehaviour
                 byte[] b = m_sendQueue.Dequeue();
                 m_cSock.Send(b);
             }
+            m_messageBatch++;
         }
         catch
         {
             Disconnect();
+        }
+    }
+
+    private void Update()
+    {
+        if (m_waitingForPing)
+        {
+            m_framesSincePing++;
+            m_pingMs += Time.deltaTime * 1000;
         }
     }
 
@@ -147,6 +189,7 @@ public class MyDemoNetworkClient : MonoBehaviour
 
     public void EnqueueMessage(string text, int commandid)
     {
+        if (text == null) text = "";
         byte[] cmdId = BitConverter.GetBytes(commandid); //4 bytes
         byte[] len = BitConverter.GetBytes(text.Length + cmdId.Length); //4 bytes
 
@@ -160,6 +203,7 @@ public class MyDemoNetworkClient : MonoBehaviour
 
     public byte[] GetMessageBytes(string text, int commandid)
     {
+        if (text == null) text = "";
         byte[] cmdId = BitConverter.GetBytes(commandid); //4 bytes
         byte[] len = BitConverter.GetBytes(text.Length + cmdId.Length); //4 bytes
 

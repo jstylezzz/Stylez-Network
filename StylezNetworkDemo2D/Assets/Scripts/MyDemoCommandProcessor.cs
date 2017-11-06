@@ -90,6 +90,11 @@ public class MyDemoCommandProcessor : MonoBehaviour
                 }
                 break;
             }
+            case EMyNetworkCommand.COMMAND_PING:
+            {
+                MyDemoNetworkClient.Instance.OnPingReceived();
+                break;
+            }
         }
     }
 }

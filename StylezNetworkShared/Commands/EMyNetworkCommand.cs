@@ -12,6 +12,7 @@ namespace StylezNetwork.Commands
         COMMAND_WORLD_GETOBJECTS,
         COMMAND_MOVE_OBJECT,
         COMMAND_REQUEST_AREAUPDATE,
-        COMMAND_OBJECT_DELETE
+        COMMAND_OBJECT_DELETE,
+        COMMAND_PING
     }
 }
