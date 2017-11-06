@@ -113,12 +113,15 @@ public class MyNetworkObject : MonoBehaviour
             MovementStartedAt = new Vector3((float)md.StartStopLocation.x, (float)md.StartStopLocation.y, (float)md.StartStopLocation.z);
             MoveDirection = new Vector3((float)md.MovementDirection.x, (float)md.MovementDirection.y, (float)md.MovementDirection.z);
         }
-        else if(md.MovementState == EMyObjectMovementState.MOVEMENT_UPDATE && IsMoving && MoveObject)
+        else if (md.MovementState == EMyObjectMovementState.MOVEMENT_UPDATE && IsMoving && MoveObject)
         {
-            Debug.Log($"DIRECTION {md.MovementDirection.x} - {md.MovementDirection.y} - {md.MovementDirection.z}");
             MoveDirection = new Vector3((float)md.MovementDirection.x, (float)md.MovementDirection.y, (float)md.MovementDirection.z);
             LastNetworkLocation = new Vector3((float)md.CurrentLocation.x, (float)md.CurrentLocation.y, (float)md.CurrentLocation.z);
             Speed = md.MovementSpeed;
+        }
+        else if (md.MovementState == EMyObjectMovementState.MOVEMENT_UPDATE && !IsMoving && !MoveObject)
+        {
+            StartMove(new Vector3((float)md.CurrentLocation.x, (float)md.CurrentLocation.y, (float)md.CurrentLocation.z), md.MovementSpeed);
         }
         else if (md.MovementState == EMyObjectMovementState.MOVEMENT_POSITION_UPDATE) transform.position = new Vector3((float)md.CurrentLocation.x, (float)md.CurrentLocation.y, (float)md.CurrentLocation.z);
     }
