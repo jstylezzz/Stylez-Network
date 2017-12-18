@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("StylezNetworkShared")]
+[assembly: AssemblyTitle("StylezNetworkCommandModule")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("StylezNetworkShared")]
+[assembly: AssemblyProduct("StylezNetworkCommandModule")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("2b9e2895-3861-4edc-b8ce-e2e15c319d4f")]
+[assembly: Guid("3667dfdb-64b6-460f-8a47-42b6db38a8f3")]
 
 // Version information for an assembly consists of the following four values:
 //
