@@ -11,8 +11,19 @@ namespace StylezDedicatedServer.Core
 {
     public class MyClientManager
     {
+        /// <summary>
+        /// The single possible instance of the ClientManager.
+        /// </summary>
         public static MyClientManager Instance { get; private set; }
+
+        /// <summary>
+        /// The dictionary containing the client registry.
+        /// </summary>
         public Dictionary<int, MyNetworkClient> ClientRegistry { get { return m_clientRegistry; } }
+
+        /// <summary>
+        /// Event that is fired when one of the clients receives a transmission.
+        /// </summary>
         public event OnTransmissionReceivedDelegate OnTransmissionReceive;
 
         private Dictionary<int, MyNetworkClient> m_clientRegistry = new Dictionary<int, MyNetworkClient>();

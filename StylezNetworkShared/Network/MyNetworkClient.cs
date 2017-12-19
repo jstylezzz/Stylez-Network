@@ -16,10 +16,26 @@ namespace StylezNetworkShared.Network
     {
         public delegate void OnConnectedToServerDelegate(bool success);
         
+        /// <summary>
+        /// NetClient mode. Is this instance a client or server?
+        /// </summary>
         public EMyNetClientMode NetClientMode { get { return m_netClientMode; } }
+
         public EndPoint ClientEndpoint { get { return m_sockData.SocketInstance.RemoteEndPoint; } }
+
+        /// <summary>
+        /// Event that is triggered when finished connecting to a server.
+        /// </summary>
         public event OnConnectedToServerDelegate OnConnectedToServer;
+
+        /// <summary>
+        /// Event that is called when this client receives a transmission.
+        /// </summary>
         public event OnTransmissionReceivedDelegate OnTransmissionReceived;
+
+        /// <summary>
+        /// This client's ID.
+        /// </summary>
         public int ClientID { get { return m_clientID; } }
 
         private MyWorkingSocket m_sockData = new MyWorkingSocket();
@@ -144,7 +160,9 @@ namespace StylezNetworkShared.Network
         }
     }
 
-    
+    /// <summary>
+    /// The available NetClient modes.
+    /// </summary>
     public enum EMyNetClientMode
     {
         /// <summary>

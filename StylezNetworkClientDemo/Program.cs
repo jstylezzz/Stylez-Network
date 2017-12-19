@@ -20,7 +20,6 @@ namespace StylezNetworkClientDemo
             MyNetworkClient nc = new MyNetworkClient(EMyNetClientMode.MODE_CLIENT);
             nc.OnTransmissionReceived += TransReceived;
             nc.ConnectToServer("127.0.0.1", 7788);
-            nc.SendTransmission(new MyNetCommand(69, "TEST TRANSMISSION"));
             Console.ReadKey();
         }
 

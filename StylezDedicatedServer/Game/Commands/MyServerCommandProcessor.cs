@@ -33,7 +33,7 @@ namespace StylezDedicatedServer.Game.Commands
         /// <param name="message">The JSON message that was received.</param>
         private void OnTransmissionReceived(MyNetworkClient fromClient, MyNetCommand message)
         {
-            MyClientManager.Instance.SendTransmissionToClients(new MyNetCommand(69, "TEST ANSWER"));
+            
         }
     }
 }
