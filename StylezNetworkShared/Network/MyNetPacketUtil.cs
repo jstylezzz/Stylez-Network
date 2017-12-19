@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StylezNetworkShared.Commands;
 
 namespace StylezNetworkShared.Network
 {
@@ -13,8 +14,15 @@ namespace StylezNetworkShared.Network
          * 
          * 4 bytes > int > transmission length
          * 8 bytes > string > authCode
+         * 4 bytes > int > commandID from command enum
          * ?? bytes > string > command
          */
+
+        /// <summary>
+        /// The initial stream read length for client messages.
+        /// These bytes contain info about the transmission content.
+        /// </summary>
+        public const int InitialTransmissionLength = 12;
 
         /// <summary>
         /// Get transmission length from message buffer.
@@ -33,15 +41,13 @@ namespace StylezNetworkShared.Network
         /// <returns>The auth code in the message.</returns>
         public static string GetAuthCodeFromBuf(byte[] buf)
         {
-            //Start at 12 because we need to skip 4 bytes for length.
-            return BitConverter.ToString(buf, 4);
+            //We read 8 bytes for the auth code.
+            return Encoding.ASCII.GetString(buf, 4, 8);
         }
 
-        public static string GetMessageFromBuf(byte[] buf)
+        public static MyNetCommand GetCommandFromBuf(byte[] buf)
         {
-            //Skip the first 12 bytes because: 4 for transmission length,
-            //8 for authcode.
-            return Encoding.ASCII.GetString(buf);
+            return new MyNetCommand(BitConverter.ToInt32(buf, 0), Encoding.ASCII.GetString(buf, 4, buf.Length - 4));
         }
 
         /// <summary>
@@ -50,7 +56,7 @@ namespace StylezNetworkShared.Network
         /// <param name="message">Message to send</param>
         /// <param name="authCode">Authcode to use</param>
         /// <returns>NetPacket instance with the transmission and its length.</returns>
-        public static MyNetPacket PackMessage(string message, string authCode)
+        public static MyNetPacket PackMessage(int commandID, string message, string authCode)
         {
             if(authCode.Length > 8)
             {
@@ -58,15 +64,18 @@ namespace StylezNetworkShared.Network
                 authCode = authCode.Remove(8, excess);
             }
 
-
+            byte[] cmdID = BitConverter.GetBytes(commandID);
             byte[] mes = Encoding.ASCII.GetBytes(message);
             byte[] code = Encoding.ASCII.GetBytes(authCode);
-            byte[] len = BitConverter.GetBytes(mes.Length);
-            byte[] packedMessage = new byte[4 + 8 + mes.Length];
+
+            //Message length + cmd id len
+            byte[] len = BitConverter.GetBytes(mes.Length + cmdID.Length);
+            byte[] packedMessage = new byte[4 + 8 + 4 + mes.Length];
 
             len.CopyTo(packedMessage, 0);
             code.CopyTo(packedMessage, 4);
-            mes.CopyTo(packedMessage, 12);
+            cmdID.CopyTo(packedMessage, 12);
+            mes.CopyTo(packedMessage, 16);
             return new MyNetPacket(packedMessage, packedMessage.Length);
         }
     }

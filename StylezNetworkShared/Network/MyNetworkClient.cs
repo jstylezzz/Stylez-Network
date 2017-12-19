@@ -5,23 +5,26 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
-using StylezNetworkShared.Network;
+using StylezNetworkShared.Commands;
 using StylezNetworkShared.Logging;
 
 namespace StylezNetworkShared.Network
 {
+    public delegate void OnTransmissionReceivedDelegate(MyNetworkClient fromClient, MyNetCommand message);
+
     public class MyNetworkClient
     {
         public delegate void OnConnectedToServerDelegate(bool success);
-        public delegate void OnTransmissionReceivedDelegate(string message);
-
+        
         public EMyNetClientMode NetClientMode { get { return m_netClientMode; } }
         public EndPoint ClientEndpoint { get { return m_sockData.SocketInstance.RemoteEndPoint; } }
         public event OnConnectedToServerDelegate OnConnectedToServer;
         public event OnTransmissionReceivedDelegate OnTransmissionReceived;
+        public int ClientID { get { return m_clientID; } }
 
         private MyWorkingSocket m_sockData = new MyWorkingSocket();
         private EMyNetClientMode m_netClientMode;
+        private int m_clientID = -1;
 
         /// <summary>
         /// Create a new instance of the NetworkClient.
@@ -97,10 +100,10 @@ namespace StylezNetworkShared.Network
         /// </summary>
         private void ListenRoutineStart()
         {
-            m_sockData.Buffer = new byte[12];
+            m_sockData.Buffer = new byte[MyNetPacketUtil.InitialTransmissionLength];
             m_sockData.ReceivedAuthCode = "";
             m_sockData.TransmissionLength = 0;
-            m_sockData.SocketInstance.BeginReceive(m_sockData.Buffer, 0, 12, SocketFlags.None, new AsyncCallback(OnTransmissionDataReceived), m_sockData.SocketInstance);
+            m_sockData.SocketInstance.BeginReceive(m_sockData.Buffer, 0, MyNetPacketUtil.InitialTransmissionLength, SocketFlags.None, new AsyncCallback(OnTransmissionDataReceived), m_sockData.SocketInstance);
         }
 
         /// <summary>
@@ -112,7 +115,6 @@ namespace StylezNetworkShared.Network
             m_sockData.SocketInstance.EndReceive(ar);
             m_sockData.TransmissionLength = MyNetPacketUtil.GetTransmissionLength(m_sockData.Buffer);
             m_sockData.ReceivedAuthCode = MyNetPacketUtil.GetAuthCodeFromBuf(m_sockData.Buffer);
-
             m_sockData.Buffer = new byte[m_sockData.TransmissionLength];
             m_sockData.SocketInstance.BeginReceive(m_sockData.Buffer, 0, m_sockData.TransmissionLength, SocketFlags.None, new AsyncCallback(OnTransmissionContentReceived), m_sockData.SocketInstance);
         }
@@ -125,18 +127,19 @@ namespace StylezNetworkShared.Network
         {
             m_sockData.SocketInstance.EndReceive(ar);
 
-            string content = MyNetPacketUtil.GetMessageFromBuf(m_sockData.Buffer);
-            OnTransmissionReceived?.Invoke(content);
+            MyNetCommand content = MyNetPacketUtil.GetCommandFromBuf(m_sockData.Buffer);
+
+            OnTransmissionReceived?.Invoke(this, content);
             ListenRoutineStart();
         }
 
         /// <summary>
         /// Send a transmission to the other end of the socket.
         /// </summary>
-        /// <param name="message">The message to send.</param>
-        public void SendTransmission(string message)
+        /// <param name="message">The NetCommand to send.</param>
+        public void SendTransmission(MyNetCommand cmd)
         {
-            MyNetPacket p = MyNetPacketUtil.PackMessage(message, "DOL69!!");
+            MyNetPacket p = MyNetPacketUtil.PackMessage(cmd.CommandID, cmd.CommandJSON, "AUTHCODE");
             m_sockData.SocketInstance.BeginSend(p.Transmission, 0, p.TransmissionLength, SocketFlags.None, new AsyncCallback(OnTransmissionSent), m_sockData.SocketInstance);
         }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StylezNetworkShared.Network;
+using StylezNetworkShared.Commands;
 
 namespace StylezNetworkClientDemo
 {
@@ -19,12 +20,13 @@ namespace StylezNetworkClientDemo
             MyNetworkClient nc = new MyNetworkClient(EMyNetClientMode.MODE_CLIENT);
             nc.OnTransmissionReceived += TransReceived;
             nc.ConnectToServer("127.0.0.1", 7788);
+            nc.SendTransmission(new MyNetCommand(69, "TEST TRANSMISSION"));
             Console.ReadKey();
         }
 
-        private void TransReceived(string c)
+        private void TransReceived(MyNetworkClient c, MyNetCommand nc)
         {
-            Console.WriteLine(c);
+            Console.WriteLine($"Received command ID {nc.CommandID} with string {nc.CommandJSON}.");
         }
     }
 }

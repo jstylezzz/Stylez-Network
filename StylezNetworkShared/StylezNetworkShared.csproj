@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\MyNetCommand.cs" />
     <Compile Include="Logging\MyLogger.cs" />
     <Compile Include="Network\MyNetPacket.cs" />
     <Compile Include="Network\MyWorkingSocket.cs" />
