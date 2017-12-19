@@ -49,6 +49,7 @@ namespace StylezDedicatedServer.Core
         public void RegisterClient(MyNetworkClient c)
         {
             c.OnTransmissionReceived += OnMessageReceived;
+            c.OnDisconnect += ClientDisconnectHandler;
             c.AuthClient(GetFreeClientID(), GenerateAuthCode());
             m_clientRegistry.Add(c.ClientID, c);
         }
@@ -62,6 +63,20 @@ namespace StylezDedicatedServer.Core
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
             return new string(Enumerable.Repeat(chars, 8)
               .Select(s => s[RandInstance.Next(s.Length)]).ToArray());
+        }
+
+        /// <summary>
+        /// Called when a client disconnects.
+        /// </summary>
+        /// <param name="clientid">The ID of the disconnecting client.</param>
+        private void ClientDisconnectHandler(int clientid)
+        {
+            MyNetworkClient c = m_clientRegistry[clientid];
+            c.OnTransmissionReceived -= OnMessageReceived;
+            c.OnDisconnect -= ClientDisconnectHandler;
+            c.SetAuthenticated(false);
+            UnregisterClient(clientid);
+            MyLogger.LogInfo($"Client ID {clientid} has disconnected.");
         }
 
         /// <summary>

@@ -54,14 +54,14 @@ namespace StylezDedicatedServer.Game.Commands
                     default:
                     {
                         //Disconnect client, they should authenticate when sending messages..
-                        
+                        fromClient.Disconnect();
                         break;
                     }
                 }
             }
             else //Client is authenticated BUT provided wrong authcode. Disconnect to be sure.
             {
-                
+                fromClient.Disconnect();
             }
         }
     }

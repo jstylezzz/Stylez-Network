@@ -7,10 +7,12 @@ using System.Net.Sockets;
 using System.Net;
 using StylezNetworkShared.Commands;
 using StylezNetworkShared.Logging;
+using System.Threading;
 
 namespace StylezNetworkShared.Network
 {
     public delegate void OnTransmissionReceivedDelegate(MyNetworkClient fromClient, MyNetCommand message);
+    public delegate void OnClientDisconnectDelegate(int clientID);
 
     public class MyNetworkClient
     {
@@ -49,15 +51,32 @@ namespace StylezNetworkShared.Network
         public event OnTransmissionReceivedDelegate OnTransmissionReceived;
 
         /// <summary>
+        /// Called when disconnecting from server/when being disconnected from server.
+        /// </summary>
+        public event OnClientDisconnectDelegate OnDisconnect;
+
+        /// <summary>
+        /// Is the socket connected?
+        /// </summary>
+        public bool IsConnected { get { return !((m_sockData.SocketInstance.Poll(1000, SelectMode.SelectRead) && (m_sockData.SocketInstance.Available == 0)) || !m_sockData.SocketInstance.Connected); } }
+
+        /// <summary>
         /// This client's ID.
         /// </summary>
         public int ClientID { get { return m_clientID; } }
+
+        /// <summary>
+        /// Amount of milliseconds to wait before checking if the socket's connection is alive.
+        /// </summary>
+        public int AliveCheckTimeout { get; set; } = 4000;
 
         private MyWorkingSocket m_sockData = new MyWorkingSocket();
         private EMyNetClientMode m_netClientMode;
         private int m_clientID = -1;
         private string m_authCode = "00000000";
         private bool m_isAuthenticated = false;
+        private bool m_shuttingDown = false;
+        private Thread m_connectionCheckThread;
 
         /// <summary>
         /// Create a new instance of the NetworkClient.
@@ -83,6 +102,8 @@ namespace StylezNetworkShared.Network
 
             m_sockData.SocketInstance = cSock;
             ListenRoutineStart();
+            m_connectionCheckThread = new Thread(ThreadedConnectionCheckLoop);
+            m_connectionCheckThread.Start();
         }
 
         /// <summary>
@@ -116,6 +137,24 @@ namespace StylezNetworkShared.Network
             if (m_sockData.SocketInstance.Connected)
             {
                 ListenRoutineStart(); //Start the listen routine if connection was successful.
+                m_connectionCheckThread = new Thread(ThreadedConnectionCheckLoop);
+                m_connectionCheckThread.Start();
+            }
+        }
+
+        /// <summary>
+        /// A loop that checks whether the connection is still alive.
+        /// This runs from a separate thread, and will automatically stop
+        /// when the client disconnects.
+        /// </summary>
+        private void ThreadedConnectionCheckLoop()
+        {
+            while(m_shuttingDown == false)
+            {
+                //We check is m_shuttingDown is equal to false since the other thread might have set it to 
+                //true after the while loop started.
+                if (!IsConnected && m_shuttingDown == false) Disconnect();
+                else Thread.Sleep(AliveCheckTimeout);
             }
         }
 
@@ -124,7 +163,18 @@ namespace StylezNetworkShared.Network
         /// </summary>
         private void OnTransmissionSent(IAsyncResult ar)
         {
-            m_sockData.SocketInstance.EndSend(ar);
+            try
+            {
+                m_sockData.SocketInstance.EndSend(ar);
+            }
+            catch (Exception e)
+            {
+                if (e.GetType() == typeof(SocketException))
+                {
+                    if (((SocketException)e).SocketErrorCode == SocketError.Shutdown && m_shuttingDown == false) Disconnect();
+                }
+            }
+            if (!IsConnected && m_shuttingDown == false) Disconnect();
         }
 
         /// <summary>
@@ -136,7 +186,18 @@ namespace StylezNetworkShared.Network
             m_sockData.Buffer = new byte[MyNetPacketUtil.InitialTransmissionLength];
             m_sockData.ReceivedAuthCode = "";
             m_sockData.TransmissionLength = 0;
-            m_sockData.SocketInstance.BeginReceive(m_sockData.Buffer, 0, MyNetPacketUtil.InitialTransmissionLength, SocketFlags.None, new AsyncCallback(OnTransmissionDataReceived), m_sockData.SocketInstance);
+
+            try
+            {
+                m_sockData.SocketInstance.BeginReceive(m_sockData.Buffer, 0, MyNetPacketUtil.InitialTransmissionLength, SocketFlags.None, new AsyncCallback(OnTransmissionDataReceived), m_sockData.SocketInstance);
+            }
+            catch (Exception e)
+            {
+                if (e.GetType() == typeof(SocketException))
+                {
+                    if (((SocketException)e).SocketErrorCode == SocketError.Shutdown && m_shuttingDown == false) Disconnect();
+                }
+            }
         }
 
         /// <summary>
@@ -145,11 +206,20 @@ namespace StylezNetworkShared.Network
         /// </summary>
         private void OnTransmissionDataReceived(IAsyncResult ar)
         {
-            m_sockData.SocketInstance.EndReceive(ar);
-            m_sockData.TransmissionLength = MyNetPacketUtil.GetTransmissionLength(m_sockData.Buffer);
-            m_sockData.ReceivedAuthCode = MyNetPacketUtil.GetAuthCodeFromBuf(m_sockData.Buffer);
-            m_sockData.Buffer = new byte[m_sockData.TransmissionLength];
-            m_sockData.SocketInstance.BeginReceive(m_sockData.Buffer, 0, m_sockData.TransmissionLength, SocketFlags.None, new AsyncCallback(OnTransmissionContentReceived), m_sockData.SocketInstance);
+            try
+            { m_sockData.SocketInstance.EndReceive(ar);
+                m_sockData.TransmissionLength = MyNetPacketUtil.GetTransmissionLength(m_sockData.Buffer);
+                m_sockData.ReceivedAuthCode = MyNetPacketUtil.GetAuthCodeFromBuf(m_sockData.Buffer);
+                m_sockData.Buffer = new byte[m_sockData.TransmissionLength];
+                m_sockData.SocketInstance.BeginReceive(m_sockData.Buffer, 0, m_sockData.TransmissionLength, SocketFlags.None, new AsyncCallback(OnTransmissionContentReceived), m_sockData.SocketInstance);
+            }
+            catch (Exception e)
+            {
+                if (e.GetType() == typeof(SocketException))
+                {
+                    if (((SocketException)e).SocketErrorCode == SocketError.Shutdown && m_shuttingDown == false) Disconnect();
+                }
+            }
         }
 
         /// <summary>
@@ -158,13 +228,23 @@ namespace StylezNetworkShared.Network
         /// </summary>
         private void OnTransmissionContentReceived(IAsyncResult ar)
         {
-            m_sockData.SocketInstance.EndReceive(ar);
+            try
+            {
+                m_sockData.SocketInstance.EndReceive(ar);
 
-            MyNetCommand content = MyNetPacketUtil.GetCommandFromBuf(m_sockData.Buffer);
-            content.AuthCode = m_sockData.ReceivedAuthCode; //IMPORTANT! Set the authcode this command came with.
+                MyNetCommand content = MyNetPacketUtil.GetCommandFromBuf(m_sockData.Buffer);
+                content.AuthCode = m_sockData.ReceivedAuthCode; //IMPORTANT! Set the authcode this command came with.
 
-            OnTransmissionReceived?.Invoke(this, content);
-            ListenRoutineStart();
+                OnTransmissionReceived?.Invoke(this, content);
+                ListenRoutineStart();
+            }
+            catch (Exception e)
+            {
+                if (e.GetType() == typeof(SocketException))
+                {
+                    if (((SocketException)e).SocketErrorCode == SocketError.Shutdown && m_shuttingDown == false) Disconnect();
+                }
+            }
         }
 
         /// <summary>
@@ -174,7 +254,17 @@ namespace StylezNetworkShared.Network
         public void SendTransmission(MyNetCommand cmd)
         {
             MyNetPacket p = MyNetPacketUtil.PackMessage(cmd.CommandID, cmd.CommandJSON, m_authCode);
-            m_sockData.SocketInstance.BeginSend(p.Transmission, 0, p.TransmissionLength, SocketFlags.None, new AsyncCallback(OnTransmissionSent), m_sockData.SocketInstance);
+            try
+            {
+                m_sockData.SocketInstance.BeginSend(p.Transmission, 0, p.TransmissionLength, SocketFlags.None, new AsyncCallback(OnTransmissionSent), m_sockData.SocketInstance);
+            }
+            catch(Exception e)
+            {
+                if(e.GetType() == typeof(SocketException))
+                {
+                    if (((SocketException)e).SocketErrorCode == SocketError.Shutdown && m_shuttingDown == false) Disconnect();
+                }
+            }
         }
 
         /// <summary>
@@ -195,6 +285,17 @@ namespace StylezNetworkShared.Network
         public void SetAuthenticated(bool set)
         {
             m_isAuthenticated = set;
+        }
+
+        /// <summary>
+        /// Disconnect this client.
+        /// </summary>
+        public void Disconnect()
+        {
+            if (m_shuttingDown) return;
+            m_shuttingDown = true;
+            m_sockData.SocketInstance.Shutdown(SocketShutdown.Both);
+            OnDisconnect?.Invoke(m_clientID);
         }
     }
 
