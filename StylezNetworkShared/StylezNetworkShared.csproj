@@ -44,6 +44,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Commands\MyNetCommand.cs" />
+    <Compile Include="Game\Commands\EMyNetworkCommands.cs" />
+    <Compile Include="Game\Commands\MyClientAuthCommand.cs" />
     <Compile Include="Logging\MyLogger.cs" />
     <Compile Include="Network\MyNetPacket.cs" />
     <Compile Include="Network\MyWorkingSocket.cs" />
@@ -51,6 +53,5 @@
     <Compile Include="Network\MyNetworkClient.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

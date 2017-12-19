@@ -12,6 +12,11 @@ namespace StylezDedicatedServer.Core
     public class MyClientManager
     {
         /// <summary>
+        /// Class wide random instance
+        /// </summary>
+        private static Random RandInstance = new Random();
+
+        /// <summary>
         /// The single possible instance of the ClientManager.
         /// </summary>
         public static MyClientManager Instance { get; private set; }
@@ -43,8 +48,20 @@ namespace StylezDedicatedServer.Core
         /// <param name="c">The NetClient instance to register.</param>
         public void RegisterClient(MyNetworkClient c)
         {
-            m_clientRegistry.Add(GetFreeClientID(), c);
             c.OnTransmissionReceived += OnMessageReceived;
+            c.AuthClient(GetFreeClientID(), GenerateAuthCode());
+            m_clientRegistry.Add(c.ClientID, c);
+        }
+
+        /// <summary>
+        /// Generate a random string to be used as auth code.
+        /// </summary>
+        /// <returns>Random string, 8 characters long.</returns>
+        private string GenerateAuthCode()
+        {
+            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, 8)
+              .Select(s => s[RandInstance.Next(s.Length)]).ToArray());
         }
 
         /// <summary>

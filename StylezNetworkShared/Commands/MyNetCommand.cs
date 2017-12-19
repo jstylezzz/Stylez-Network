@@ -19,7 +19,12 @@ namespace StylezNetworkShared.Commands
         public int CommandID { get; }
 
         /// <summary>
-        /// Set up a new NetCommand instance.
+        /// The authcode that this command was sent with.
+        /// </summary>
+        public string AuthCode { get; set; }
+
+        /// <summary>
+        /// Set up a new NetCommand instance with command JSON data.
         /// </summary>
         /// <param name="ID">The ID of the command.</param>
         /// <param name="cmd">The JSON string of the command.</param>
@@ -27,6 +32,18 @@ namespace StylezNetworkShared.Commands
         {
             CommandID = ID;
             CommandJSON = cmd;
+            AuthCode = "NOAUTHCD";
+        }
+
+        /// <summary>
+        /// Set up a new NetCommand instance without command JSON data.
+        /// </summary>
+        /// <param name="ID">The ID of the command.</param>
+        public MyNetCommand(int ID)
+        {
+            CommandID = ID;
+            CommandJSON = " ";
+            AuthCode = "NOAUTHCD";
         }
     }
 }

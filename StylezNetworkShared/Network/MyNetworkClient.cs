@@ -24,6 +24,21 @@ namespace StylezNetworkShared.Network
         public EndPoint ClientEndpoint { get { return m_sockData.SocketInstance.RemoteEndPoint; } }
 
         /// <summary>
+        /// The WorkingSocket instance of this client.
+        /// </summary>
+        public MyWorkingSocket WorkingSocket { get { return m_sockData; } }
+
+        /// <summary>
+        /// The client's authcode.
+        /// </summary>
+        public string AuthCode { get { return m_authCode; } }
+
+        /// <summary>
+        /// Is the client authenticated?
+        /// </summary>
+        public bool IsAuthenticated { get { return m_isAuthenticated; } }
+
+        /// <summary>
         /// Event that is triggered when finished connecting to a server.
         /// </summary>
         public event OnConnectedToServerDelegate OnConnectedToServer;
@@ -41,6 +56,8 @@ namespace StylezNetworkShared.Network
         private MyWorkingSocket m_sockData = new MyWorkingSocket();
         private EMyNetClientMode m_netClientMode;
         private int m_clientID = -1;
+        private string m_authCode = "00000000";
+        private bool m_isAuthenticated = false;
 
         /// <summary>
         /// Create a new instance of the NetworkClient.
@@ -144,6 +161,7 @@ namespace StylezNetworkShared.Network
             m_sockData.SocketInstance.EndReceive(ar);
 
             MyNetCommand content = MyNetPacketUtil.GetCommandFromBuf(m_sockData.Buffer);
+            content.AuthCode = m_sockData.ReceivedAuthCode; //IMPORTANT! Set the authcode this command came with.
 
             OnTransmissionReceived?.Invoke(this, content);
             ListenRoutineStart();
@@ -155,8 +173,28 @@ namespace StylezNetworkShared.Network
         /// <param name="message">The NetCommand to send.</param>
         public void SendTransmission(MyNetCommand cmd)
         {
-            MyNetPacket p = MyNetPacketUtil.PackMessage(cmd.CommandID, cmd.CommandJSON, "AUTHCODE");
+            MyNetPacket p = MyNetPacketUtil.PackMessage(cmd.CommandID, cmd.CommandJSON, m_authCode);
             m_sockData.SocketInstance.BeginSend(p.Transmission, 0, p.TransmissionLength, SocketFlags.None, new AsyncCallback(OnTransmissionSent), m_sockData.SocketInstance);
+        }
+
+        /// <summary>
+        /// Authenticate this client instance.
+        /// </summary>
+        /// <param name="ID">The ID to set.</param>
+        /// <param name="code">The auth code to register.</param>
+        public void AuthClient(int ID, string code)
+        {
+            m_clientID = ID;
+            m_authCode = code;
+        }
+
+        /// <summary>
+        /// Set the auth status for this client.
+        /// </summary>
+        /// <param name="set">The auth status.</param>
+        public void SetAuthenticated(bool set)
+        {
+            m_isAuthenticated = set;
         }
     }
 
