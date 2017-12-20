@@ -49,6 +49,9 @@
     <Compile Include="Core\MyDedicatedServer.cs" />
     <Compile Include="Events\MyEventManager.cs" />
     <Compile Include="Game\Commands\MyServerCommandProcessor.cs" />
+    <Compile Include="Game\Manager\MyClientEntityCollection.cs" />
+    <Compile Include="Game\Manager\MyClientWorldManager.cs" />
+    <Compile Include="Game\Manager\MyServerWorldManager.cs" />
     <Compile Include="Network\MyClientListener.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

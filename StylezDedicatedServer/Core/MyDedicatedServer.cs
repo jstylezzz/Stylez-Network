@@ -8,6 +8,7 @@ using StylezNetworkShared.Logging;
 using StylezDedicatedServer.Network;
 using StylezDedicatedServer.Events;
 using StylezDedicatedServer.Game.Commands;
+using StylezDedicatedServer.Game.Manager;
 
 namespace StylezDedicatedServer.Core
 {
@@ -28,6 +29,8 @@ namespace StylezDedicatedServer.Core
         private void InitializeGameSpecificInstances()
         {
             new MyServerCommandProcessor();
+            new MyServerWorldManager();
+            new MyClientWorldManager();
         }
 
         /// <summary>

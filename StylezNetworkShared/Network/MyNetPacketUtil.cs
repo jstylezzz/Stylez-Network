@@ -53,7 +53,9 @@ namespace StylezNetworkShared.Network
         public static MyNetCommand GetCommandFromBuf(byte[] buf)
         {
             //First 4 bytes are command ID, rest of the bytes are JSON.
-            return new MyNetCommand(BitConverter.ToInt32(buf, 0), Encoding.ASCII.GetString(buf, 4, buf.Length - 4));
+            if (buf.Length > 4) return new MyNetCommand(BitConverter.ToInt32(buf, 0), Encoding.ASCII.GetString(buf, 4, buf.Length - 4));
+            else if (buf.Length == 4) return new MyNetCommand(BitConverter.ToInt32(buf, 0), "EMPTY");
+            else return new MyNetCommand(0);
         }
 
         /// <summary>

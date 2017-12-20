@@ -9,6 +9,9 @@ using StylezNetworkShared.Network;
 
 namespace StylezDedicatedServer.Core
 {
+    public delegate void OnClientConnectedDelegate(int clientID);
+    public delegate void OnClientDisconnectedDelegate(int clientID);
+
     public class MyClientManager
     {
         /// <summary>
@@ -29,7 +32,17 @@ namespace StylezDedicatedServer.Core
         /// <summary>
         /// Event that is fired when one of the clients receives a transmission.
         /// </summary>
-        public event OnTransmissionReceivedDelegate OnTransmissionReceive;
+        public event OnTransmissionReceivedServerDelegate OnTransmissionReceive;
+
+        /// <summary>
+        /// Event that is fired when a client has been added to the client registry.
+        /// </summary>
+        public event OnClientConnectedDelegate OnClientConnected;
+
+        /// <summary>
+        /// Event that is fired when a client has been removed from the client registry.
+        /// </summary>
+        public event OnClientDisconnectedDelegate OnClientDisconnected;
 
         private Dictionary<int, MyNetworkClient> m_clientRegistry = new Dictionary<int, MyNetworkClient>();
         private int m_highestClientID = -1;
@@ -49,10 +62,11 @@ namespace StylezDedicatedServer.Core
         public void RegisterClient(MyNetworkClient c)
         {
             int ID = GetFreeClientID();
-            c.OnTransmissionReceived += OnMessageReceived;
+            c.OnTransmissionReceivedServer += OnMessageReceived;
             c.OnServerSideClientDisconnect += ClientDisconnectHandler;
             c.AuthClient(ID, GenerateAuthCode());
             m_clientRegistry.Add(ID, c);
+            OnClientConnected?.Invoke(ID);
             MyLogger.LogInfo($"Client ID {ID} has connected.");
         }
 
@@ -74,7 +88,7 @@ namespace StylezDedicatedServer.Core
         private void ClientDisconnectHandler(int clientid)
         {
             MyNetworkClient c = m_clientRegistry[clientid];
-            c.OnTransmissionReceived -= OnMessageReceived;
+            c.OnTransmissionReceivedServer -= OnMessageReceived;
             c.OnServerSideClientDisconnect -= ClientDisconnectHandler;
             c.SetAuthenticated(false);
             UnregisterClient(clientid);
@@ -87,6 +101,7 @@ namespace StylezDedicatedServer.Core
         /// <param name="clientID">The client ID to unregister.</param>
         public void UnregisterClient(int clientID)
         {
+            OnClientDisconnected?.Invoke(clientID);
             m_clientRegistry.Remove(clientID);
             ReturnClientIDToPool(clientID);
         }

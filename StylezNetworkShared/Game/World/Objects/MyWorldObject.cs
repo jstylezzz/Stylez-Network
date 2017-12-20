@@ -10,6 +10,11 @@ namespace StylezNetworkShared.Game.World.Objects
     public class MyWorldObject
     {
         /// <summary>
+        /// The name of the object prefab.
+        /// </summary>
+        public string ObjectPrefabName { get; set; }
+
+        /// <summary>
         /// The object's position data.
         /// </summary>
         public MyWorldPosition ObjectPosition { get; set; } = new MyWorldPosition();

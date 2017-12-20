@@ -9,6 +9,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using StylezNetworkShared.Network;
+using StylezNetworkShared.Commands;
+using StylezNetworkShared.Game.Commands;
+using System.Threading;
 
 namespace StylezNetworkDemo.Network
 {
@@ -47,8 +50,30 @@ namespace StylezNetworkDemo.Network
                 Debug.Log("Connection successful.");
                 m_netClient.OnConnectedToServer -= OnServerConnectComplete;
                 m_netClient.OnDisconnectFromServer += OnDisconnect;
+                m_netClient.OnTransmissionReceivedClient += OnTransmissionReceived;
+                
+                m_netClient.SendTransmission(new StylezNetworkShared.Commands.MyNetCommand((int)EMyNetworkCommands.AUTHENTICATE));
             }
             else Debug.LogWarning("Connection to the server has failed.");
+        }
+
+        /// <summary>
+        /// Called when receiving a transmission from the server.
+        /// </summary>
+        /// <param name="message">The NetCommand received.</param>
+        private void OnTransmissionReceived(MyNetCommand message)
+        {
+            switch ((EMyNetworkCommands)message.CommandID)
+            {
+                case EMyNetworkCommands.AUTHENTICATE:
+                {
+                    MyClientAuthCommand cmd = JsonUtility.FromJson<MyClientAuthCommand>(message.CommandJSON);
+                    m_netClient.AuthClient(cmd.ClientID, cmd.AuthCode);
+                    m_netClient.SetAuthenticated(true);
+                    break;
+                }
+            }
+            //Debug.Log($"RECEIVED {message.CommandID}: " + message.CommandJSON);
         }
 
         /// <summary>

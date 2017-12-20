@@ -12,9 +12,26 @@ namespace StylezNetworkShared.Game.Commands
     public enum EMyNetworkCommands
     {
         /// <summary>
+        /// This is reserved for errors.
+        /// </summary>
+        ERROR,
+
+        /// <summary>
         /// Serverside: Request for an auth code and client ID.
         /// Clientside: Register received client ID and auth code.
         /// </summary>
-        AUTHENTICATE
+        AUTHENTICATE,
+
+        /// <summary>
+        /// Serverside: Register new object to the world manager.
+        /// Clientside: Request object to be spawned in the world.
+        /// </summary>
+        SPAWN_OBJECT,
+
+        /// <summary>
+        /// Serverside: Send the list of objects in range to the client.
+        /// Clientside: Update existing objects, spawn new objects, delete removed objects.
+        /// </summary>
+        WORLD_AREA_UPDATE
     }
 }

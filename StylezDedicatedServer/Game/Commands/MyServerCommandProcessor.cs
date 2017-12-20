@@ -8,6 +8,9 @@ using StylezNetworkShared.Network;
 using StylezNetworkShared.Commands;
 using StylezNetworkShared.Game.Commands;
 using Newtonsoft.Json;
+using StylezNetworkShared.Logging;
+using StylezNetworkShared.Game.World.Objects;
+using StylezDedicatedServer.Game.Manager;
 
 namespace StylezDedicatedServer.Game.Commands
 {
@@ -39,9 +42,35 @@ namespace StylezDedicatedServer.Game.Commands
             //correct authentication.
             if (fromClient.IsAuthenticated && fromClient.AuthCode.Equals(cmd.AuthCode))
             {
-                
+                switch ((EMyNetworkCommands)cmd.CommandID)
+                {
+                    case EMyNetworkCommands.SPAWN_OBJECT:
+                    {
+                        MyWorldObject obj = JsonConvert.DeserializeObject<MyWorldObject>(cmd.CommandJSON);
+                        obj.OwnerID = fromClient.ClientID; //We set this here to prevent spoofing from the other end.
+                        MyServerWorldManager.Instance.RegisterObject(obj); //Register the object to the world manager. It will auto-broadcast when clients perform area updates.
+                        
+                        break;
+                    }
+                    case EMyNetworkCommands.WORLD_AREA_UPDATE:
+                    {
+                        int[] ids = MyClientWorldManager.Instance.GetCollectionForClient(fromClient.ClientID).RangedObjects;
+                        if (ids != null && ids.Length > 0)
+                        {
+                            MyWorldObject[] objs = MyServerWorldManager.Instance.GetObjects(ids);
+                            fromClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.WORLD_AREA_UPDATE, JsonConvert.SerializeObject(new MyAreaUpdate(objs.Length, objs))));
+                        }
+                        else fromClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.WORLD_AREA_UPDATE, JsonConvert.SerializeObject(new MyAreaUpdate())));
+                        break;
+                    }
+                    default:
+                    {
+                        MyLogger.LogError($"Client ID {fromClient.ClientID} attempted to execute an invalid command (ID: {cmd.CommandID}).");
+                        break;
+                    }
+                }
             }
-            else if(!fromClient.IsAuthenticated) //Commands that may be performed while not authenticated
+            else if (!fromClient.IsAuthenticated) //Commands that may be performed while not authenticated
             {
                 switch ((EMyNetworkCommands)cmd.CommandID)
                 {
