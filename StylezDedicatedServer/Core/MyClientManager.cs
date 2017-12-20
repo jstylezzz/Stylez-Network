@@ -48,10 +48,12 @@ namespace StylezDedicatedServer.Core
         /// <param name="c">The NetClient instance to register.</param>
         public void RegisterClient(MyNetworkClient c)
         {
+            int ID = GetFreeClientID();
             c.OnTransmissionReceived += OnMessageReceived;
             c.OnDisconnect += ClientDisconnectHandler;
-            c.AuthClient(GetFreeClientID(), GenerateAuthCode());
-            m_clientRegistry.Add(c.ClientID, c);
+            c.AuthClient(ID, GenerateAuthCode());
+            m_clientRegistry.Add(ID, c);
+            MyLogger.LogInfo($"Client ID {ID} has connected.");
         }
 
         /// <summary>
@@ -131,7 +133,7 @@ namespace StylezDedicatedServer.Core
             if(m_freeIDS.Count == 0)
             {
                 if (markInUse) m_highestClientID++;
-                return m_highestClientID--;
+                return m_highestClientID;
             }
             else
             {

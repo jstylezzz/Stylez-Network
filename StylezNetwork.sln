@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StylezNetworkShared", "Styl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StylezDedicatedServer", "StylezDedicatedServer\StylezDedicatedServer.csproj", "{4077103C-C2F7-4AE6-9025-66671E60CEB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StylezNetworkClientDemo", "StylezNetworkClientDemo\StylezNetworkClientDemo.csproj", "{F5FEF751-65EC-4753-AF93-88CBFC31B6ED}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{4077103C-C2F7-4AE6-9025-66671E60CEB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4077103C-C2F7-4AE6-9025-66671E60CEB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4077103C-C2F7-4AE6-9025-66671E60CEB9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F5FEF751-65EC-4753-AF93-88CBFC31B6ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F5FEF751-65EC-4753-AF93-88CBFC31B6ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F5FEF751-65EC-4753-AF93-88CBFC31B6ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F5FEF751-65EC-4753-AF93-88CBFC31B6ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

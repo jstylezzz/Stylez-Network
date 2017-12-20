@@ -46,6 +46,9 @@
     <Compile Include="Commands\MyNetCommand.cs" />
     <Compile Include="Game\Commands\EMyNetworkCommands.cs" />
     <Compile Include="Game\Commands\MyClientAuthCommand.cs" />
+    <Compile Include="Game\World\Objects\MyMovementData.cs" />
+    <Compile Include="Game\World\Objects\MyWorldObject.cs" />
+    <Compile Include="Game\World\Objects\MyWorldPosition.cs" />
     <Compile Include="Logging\MyLogger.cs" />
     <Compile Include="Network\MyNetPacket.cs" />
     <Compile Include="Network\MyWorkingSocket.cs" />

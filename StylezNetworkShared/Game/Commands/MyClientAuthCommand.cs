@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StylezNetworkShared.Game.Commands
 {
-    [System.Serializable]
+    [Serializable]
     public struct MyClientAuthCommand
     {
         public int ClientID;
