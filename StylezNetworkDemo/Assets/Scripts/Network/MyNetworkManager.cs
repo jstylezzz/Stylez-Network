@@ -21,7 +21,7 @@ namespace StylezNetworkDemo.Network
         private string m_ip = "127.0.0.1";
 
         [SerializeField]
-        private int m_port = 7778;
+        private int m_port = 7788;
 
         private MyNetworkClient m_netClient;
 
@@ -31,36 +31,47 @@ namespace StylezNetworkDemo.Network
         private void Start()
         {
             Debug.Log($"Starting the NetClient on {m_ip}:{m_port}.");
-            m_netClient = new MyNetworkClient(EMyNetClientMode.MODE_CLIENT);
+            m_netClient = new MyNetworkClient(EMyNetClientMode.MODE_CLIENTSIDE);
             m_netClient.OnConnectedToServer += OnServerConnectComplete;
             m_netClient.ConnectToServer(m_ip, m_port);
         }
 
+        /// <summary>
+        /// Called when server connection completes.
+        /// </summary>
+        /// <param name="success">Will be true when connection is successful, false if not.</param>
         private void OnServerConnectComplete(bool success)
         {
             if (success)
             {
                 Debug.Log("Connection successful.");
                 m_netClient.OnConnectedToServer -= OnServerConnectComplete;
-                m_netClient.OnDisconnect += OnDisconnect;
+                m_netClient.OnDisconnectFromServer += OnDisconnect;
             }
             else Debug.LogWarning("Connection to the server has failed.");
         }
 
+        /// <summary>
+        /// Called when disconnecting from the server.
+        /// </summary>
 
-        private void OnDisconnect(int clientID)
+        private void OnDisconnect()
         {
-            m_netClient.OnDisconnect -= OnDisconnect;
+            m_netClient.OnDisconnectFromServer -= OnDisconnect;
             Debug.LogWarning("Disconnected from the server.");
         }
 
+        /// <summary>
+        /// Be sure to disconnect on destroy. Otherwise things might
+        /// stay active in the background.
+        /// </summary>
         private void OnDestroy()
         {
             if (m_netClient.IsConnected) m_netClient.Disconnect();
         }
 
         /// <summary>
-        /// Script update look.
+        /// Script update loop.
         /// </summary>
         private void Update()
         {

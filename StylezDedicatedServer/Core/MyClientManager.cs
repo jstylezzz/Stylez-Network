@@ -50,7 +50,7 @@ namespace StylezDedicatedServer.Core
         {
             int ID = GetFreeClientID();
             c.OnTransmissionReceived += OnMessageReceived;
-            c.OnDisconnect += ClientDisconnectHandler;
+            c.OnServerSideClientDisconnect += ClientDisconnectHandler;
             c.AuthClient(ID, GenerateAuthCode());
             m_clientRegistry.Add(ID, c);
             MyLogger.LogInfo($"Client ID {ID} has connected.");
@@ -75,7 +75,7 @@ namespace StylezDedicatedServer.Core
         {
             MyNetworkClient c = m_clientRegistry[clientid];
             c.OnTransmissionReceived -= OnMessageReceived;
-            c.OnDisconnect -= ClientDisconnectHandler;
+            c.OnServerSideClientDisconnect -= ClientDisconnectHandler;
             c.SetAuthenticated(false);
             UnregisterClient(clientid);
             MyLogger.LogInfo($"Client ID {clientid} has disconnected.");

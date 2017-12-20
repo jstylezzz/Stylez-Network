@@ -11,8 +11,23 @@ using System.Threading;
 
 namespace StylezNetworkShared.Network
 {
+    /// <summary>
+    /// Used for the transmission received event.
+    /// </summary>
+    /// <param name="fromClient">The instance of the client that received the transmission.</param>
+    /// <param name="message">The NetCommand in the transmission.</param>
     public delegate void OnTransmissionReceivedDelegate(MyNetworkClient fromClient, MyNetCommand message);
+
+    /// <summary>
+    /// This delegate is used for the serverside disconnect event.
+    /// </summary>
+    /// <param name="clientID">The client ID that disconnected.</param>
     public delegate void OnClientDisconnectDelegate(int clientID);
+
+    /// <summary>
+    /// This delegate is used for the client side disconnect event.
+    /// </summary>
+    public delegate void OnDisconnectedFromServerDelegate();
 
     public class MyNetworkClient
     {
@@ -51,9 +66,14 @@ namespace StylezNetworkShared.Network
         public event OnTransmissionReceivedDelegate OnTransmissionReceived;
 
         /// <summary>
-        /// Called when disconnecting from server/when being disconnected from server.
+        /// Called !serverside! when client disconnects from the server.
         /// </summary>
-        public event OnClientDisconnectDelegate OnDisconnect;
+        public event OnClientDisconnectDelegate OnServerSideClientDisconnect;
+
+        /// <summary>
+        /// Called !clientside! when disconnected from server.
+        /// </summary>
+        public event OnDisconnectedFromServerDelegate OnDisconnectFromServer;
 
         /// <summary>
         /// Is the socket connected?
@@ -94,7 +114,7 @@ namespace StylezNetworkShared.Network
         /// <param name="cSock">The socket to register as working socket.</param>
         public void RegisterWorkingSocket(Socket cSock)
         {
-            if(m_netClientMode == EMyNetClientMode.MODE_CLIENT)
+            if(m_netClientMode == EMyNetClientMode.MODE_CLIENTSIDE)
             {
                 MyLogger.LogError("Cannot register a listen socket to a NetClient while it's running in client mode.");
                 return;
@@ -114,7 +134,7 @@ namespace StylezNetworkShared.Network
         /// <param name="port">The port to connect to.</param>
         public void ConnectToServer(string ip, int port)
         {
-            if (m_netClientMode == EMyNetClientMode.MODE_SERVER)
+            if (m_netClientMode == EMyNetClientMode.MODE_SERVERSIDE)
             {
                 MyLogger.LogError("Cannot connect NetClient to a server while it's running in server mode.");
                 return;
@@ -295,7 +315,8 @@ namespace StylezNetworkShared.Network
             if (m_shuttingDown) return;
             m_shuttingDown = true;
             m_sockData.SocketInstance.Shutdown(SocketShutdown.Both);
-            OnDisconnect?.Invoke(m_clientID);
+            if (m_netClientMode == EMyNetClientMode.MODE_SERVERSIDE) OnServerSideClientDisconnect?.Invoke(m_clientID);
+            else if (m_netClientMode == EMyNetClientMode.MODE_CLIENTSIDE) OnDisconnectFromServer?.Invoke();
         }
     }
 
@@ -307,11 +328,11 @@ namespace StylezNetworkShared.Network
         /// <summary>
         /// NetClient runs in server mode. 
         /// </summary>
-        MODE_SERVER,
+        MODE_SERVERSIDE,
 
         /// <summary>
         /// NetClient runs in client mode.
         /// </summary>
-        MODE_CLIENT
+        MODE_CLIENTSIDE
     }
 }

@@ -45,7 +45,7 @@ namespace StylezDedicatedServer.Network
 
         private void OnReceiveIncomingConnection(IAsyncResult ar)
         {
-            MyNetworkClient nc = new MyNetworkClient(EMyNetClientMode.MODE_SERVER);
+            MyNetworkClient nc = new MyNetworkClient(EMyNetClientMode.MODE_SERVERSIDE);
             nc.RegisterWorkingSocket(m_socketData.SocketInstance.EndAccept(ar));
 
             MyLogger.LogInfo($"Incoming connection from {nc.ClientEndpoint.ToString()}..");
