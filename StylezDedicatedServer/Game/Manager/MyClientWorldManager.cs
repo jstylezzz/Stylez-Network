@@ -42,7 +42,7 @@ namespace StylezDedicatedServer.Game.Manager
             MyClientEntityCollection ec = m_clientEntityCollection[clientID];
             int[] o = ec.OwnedObjects;
             foreach(MyWorldObject obj in MyServerWorldManager.Instance.GetObjects(o))
-            {
+            { 
                 if (obj.DestroyOnDisconnect == true) MyServerWorldManager.Instance.UnregisterObject(obj);
             }
             m_clientEntityCollection.Remove(clientID);

@@ -55,8 +55,8 @@ namespace StylezDedicatedServer.Game.Manager
         public void UnregisterObject(MyWorldObject o)
         {
             ReturnObjectIDToPool(o.ObjectID);
-            m_worldObjectRegistry.Remove(o.ObjectID);
             OnObjectUnregistered?.Invoke(o.OwnerID, o.ObjectID);
+            m_worldObjectRegistry.Remove(o.ObjectID);
         }
 
         /// <summary>
