@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StylezDedicatedServer.Core;
+using StylezNetworkShared.Game.World.Objects;
 
 namespace StylezDedicatedServer.Game.Manager
 {
@@ -24,7 +25,7 @@ namespace StylezDedicatedServer.Game.Manager
             else return;
 
             MyServerWorldManager.Instance.OnObjectRegistered += OnObjectRegistered;
-            MyServerWorldManager.Instance.OnObjectRegistered += OnObjectUnregistered;
+            MyServerWorldManager.Instance.OnObjectUnregistered += OnObjectUnregistered;
             MyClientManager.Instance.OnClientConnected += OnClientConnected;
             MyClientManager.Instance.OnClientDisconnected += OnClientDisconnected;
         }
@@ -38,6 +39,12 @@ namespace StylezDedicatedServer.Game.Manager
         private void OnClientDisconnected(int clientID)
         {
             //Remove the collection for this client
+            MyClientEntityCollection ec = m_clientEntityCollection[clientID];
+            int[] o = ec.OwnedObjects;
+            foreach(MyWorldObject obj in MyServerWorldManager.Instance.GetObjects(o))
+            {
+                if (obj.DestroyOnDisconnect == true) MyServerWorldManager.Instance.UnregisterObject(obj);
+            }
             m_clientEntityCollection.Remove(clientID);
         }
 

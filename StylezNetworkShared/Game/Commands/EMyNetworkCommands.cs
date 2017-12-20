@@ -24,7 +24,7 @@ namespace StylezNetworkShared.Game.Commands
 
         /// <summary>
         /// Serverside: Register new object to the world manager.
-        /// Clientside: Request object to be spawned in the world.
+        /// Clientside: Nothing.
         /// </summary>
         SPAWN_OBJECT,
 

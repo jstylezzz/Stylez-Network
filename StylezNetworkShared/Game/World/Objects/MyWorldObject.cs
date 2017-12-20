@@ -10,6 +10,11 @@ namespace StylezNetworkShared.Game.World.Objects
     public class MyWorldObject
     {
         /// <summary>
+        /// Should the object be destroyed when its owner disconnects?
+        /// </summary>
+        public bool DestroyOnDisconnect { get; set; }
+
+        /// <summary>
         /// The name of the object prefab.
         /// </summary>
         public string ObjectPrefabName { get; set; }
@@ -35,6 +40,14 @@ namespace StylezNetworkShared.Game.World.Objects
         public int OwnerID { get; set; }
 
         /// <summary>
+        /// JSON constructor
+        /// </summary>
+        public MyWorldObject()
+        {
+
+        }
+
+        /// <summary>
         /// Create an instance of a world object.
         /// This constructor is best used clientside.
         /// </summary>
@@ -48,6 +61,22 @@ namespace StylezNetworkShared.Game.World.Objects
             ObjectID = objectID;
             OwnerID = ownerID;
             ObjectPosition = new MyWorldPosition(x, y, z);
+        }
+
+        /// <summary>
+        /// Create an instance of a world object.
+        /// This constructor is best used clientside.
+        /// </summary>
+        /// <param name="x">X position of the object.</param>
+        /// <param name="y">Y position of the object.</param>
+        /// <param name="z">Z position of the object.</param>
+        /// <param name="objectID">The local ID of the object.</param>
+        /// <param name="ownerID">The owner ID of the object.</param>
+        public MyWorldObject(float x, float y, float z, string prefabName, bool destroyOnDisconnect)
+        {
+            ObjectPrefabName = prefabName;
+            ObjectPosition = new MyWorldPosition(x, y, z);
+            DestroyOnDisconnect = destroyOnDisconnect;
         }
 
         /// <summary>
