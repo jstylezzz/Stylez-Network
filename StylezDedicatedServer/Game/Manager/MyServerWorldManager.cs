@@ -105,6 +105,7 @@ namespace StylezDedicatedServer.Game.Manager
         /// <returns>An array of WorldObject instances.</returns>
         public MyWorldObject[] GetObjects(int[] objectids)
         {
+            if (objectids == null) return null;
             MyWorldObject[] all = new MyWorldObject[objectids.Length];
             for (int i = 0; i < objectids.Length; i++) all[i] = m_worldObjectRegistry[objectids[i]];
             return all;
