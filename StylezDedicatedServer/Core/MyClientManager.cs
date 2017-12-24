@@ -125,6 +125,16 @@ namespace StylezDedicatedServer.Core
         }
 
         /// <summary>
+        /// Send a transmission to a client ID.
+        /// </summary>
+        /// <param name="clientID">The client ID of the client to send the transmission to.</param>
+        /// <param name="cmd">The command to send.</param>
+        public void SendTransmissionToClient(int clientID, MyNetCommand cmd)
+        {
+            m_clientRegistry[clientID]?.SendTransmission(cmd);
+        }
+
+        /// <summary>
         /// Send a transmission to connected clients, with exception of the specified client ID.
         /// </summary>
         /// <param name="cmd">The NetCommand that should be sent to the client.</param>

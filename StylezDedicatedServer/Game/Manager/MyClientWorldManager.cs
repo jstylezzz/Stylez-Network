@@ -5,6 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using StylezDedicatedServer.Core;
 using StylezNetworkShared.Game.World.Objects;
+using StylezNetworkShared.Game.Commands;
+using System.Threading;
+using Newtonsoft.Json;
+using StylezDedicatedServer.Threading;
+using StylezNetworkShared.Logging;
 
 namespace StylezDedicatedServer.Game.Manager
 {
@@ -18,6 +23,7 @@ namespace StylezDedicatedServer.Game.Manager
         public static MyClientWorldManager Instance { get; private set; }
 
         private Dictionary<int, MyClientEntityCollection> m_clientEntityCollection = new Dictionary<int, MyClientEntityCollection>();
+        private static Queue<MyAreaUpdateRequest> m_threadedUpdateRequests = new Queue<MyAreaUpdateRequest>();
 
         public MyClientWorldManager()
         {
@@ -28,6 +34,8 @@ namespace StylezDedicatedServer.Game.Manager
             MyServerWorldManager.Instance.OnObjectUnregistered += OnObjectUnregistered;
             MyClientManager.Instance.OnClientConnected += OnClientConnected;
             MyClientManager.Instance.OnClientDisconnected += OnClientDisconnected;
+
+            new Thread(ThreadedAreaUpdate).Start();
         }
 
         private void OnClientConnected(int clientID)
@@ -68,6 +76,45 @@ namespace StylezDedicatedServer.Game.Manager
         public MyClientEntityCollection GetCollectionForClient(int clientid)
         {
             return m_clientEntityCollection[clientid];
+        }
+
+        /// <summary>
+        /// Perform an area update for a client.
+        /// On completion, new area data is sent to the client.
+        /// </summary>
+        /// <param name="ar">Area update request instance.</param>
+        public void PerformClientAreaUpdate(MyAreaUpdateRequest ar)
+        {
+            m_threadedUpdateRequests.Enqueue(ar);
+        }
+
+        private void ThreadedAreaUpdate()
+        {
+            MyThreadManager tm = MyThreadManager.Instance;
+            MyAreaUpdateRequest ar;
+            while (tm.ThreadingRunning)
+            {
+                if(m_threadedUpdateRequests.Count > 0)
+                {
+                    ar = m_threadedUpdateRequests.Dequeue();
+                    List<int> inRange = new List<int>();
+                    List<MyWorldObject> inRangeO = new List<MyWorldObject>();
+                    MyWorldObject[] wos = MyServerWorldManager.Instance.GetObjects();
+
+                    foreach (MyWorldObject w in wos)
+                    {
+                        if (w.ObjectPosition.Dimension == ar.Dimension && w.DistanceTo(ar.PosX, ar.PosY, ar.PosZ) <= ar.StreamDistance)
+                        {
+                            inRange.Add(w.ObjectID);
+                            inRangeO.Add(w);
+                        }
+                    }
+                    MyClientEntityCollection ec = GetCollectionForClient(ar.ForClientID);
+                    ec?.UpdateRangedObjectList(inRange.ToArray());
+                    MyClientManager.Instance.SendTransmissionToClient(ar.ForClientID, new StylezNetworkShared.Commands.MyNetCommand((int)EMyNetworkCommands.WORLD_AREA_UPDATE, JsonConvert.SerializeObject(new MyAreaUpdate(ec.RangedObjects.Length, inRangeO.ToArray()))));
+                }
+            }
+            MyLogger.LogInfo("Threaded area update stopping..");
         }
     }
 }

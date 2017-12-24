@@ -54,13 +54,7 @@ namespace StylezDedicatedServer.Game.Commands
                     }
                     case EMyNetworkCommands.WORLD_AREA_UPDATE:
                     {
-                        int[] ids = MyClientWorldManager.Instance.GetCollectionForClient(fromClient.ClientID).RangedObjects;
-                        if (ids != null && ids.Length > 0)
-                        {
-                            MyWorldObject[] objs = MyServerWorldManager.Instance.GetObjects(ids);
-                            fromClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.WORLD_AREA_UPDATE, JsonConvert.SerializeObject(new MyAreaUpdate(objs.Length, objs))));
-                        }
-                        else fromClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.WORLD_AREA_UPDATE, JsonConvert.SerializeObject(new MyAreaUpdate())));
+                        MyClientWorldManager.Instance.PerformClientAreaUpdate(JsonConvert.DeserializeObject<MyAreaUpdateRequest>(cmd.CommandJSON));
                         break;
                     }
                     default:

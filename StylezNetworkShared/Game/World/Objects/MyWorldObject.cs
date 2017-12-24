@@ -106,5 +106,17 @@ namespace StylezNetworkShared.Game.World.Objects
             OwnerID = ownerID;
             ObjectID = objectID;
         }
+
+        /// <summary>
+        /// Get the distance from this object to a point.
+        /// </summary>
+        /// <param name="x">X position of the point.</param>
+        /// <param name="y">Y position of the point.</param>
+        /// <param name="z">Z position of the point.</param>
+        /// <returns>A float with the distance.</returns>
+        public float DistanceTo(float x, float y, float z)
+        {
+            return (float)(Math.Sqrt(Math.Pow(Math.Abs(ObjectPosition.x - x), 2) + Math.Pow(Math.Abs(ObjectPosition.y - y), 2) + Math.Pow(Math.Abs(ObjectPosition.z - z), 2)));
+        }
     }
 }

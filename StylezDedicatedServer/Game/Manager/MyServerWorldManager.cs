@@ -112,6 +112,15 @@ namespace StylezDedicatedServer.Game.Manager
         }
 
         /// <summary>
+        /// Get an array of WorldObjects currently registered.
+        /// </summary>
+        /// <returns>An array of WorldObject instances.</returns>
+        public MyWorldObject[] GetObjects()
+        {
+            return m_worldObjectRegistry.Values.ToArray();
+        }
+
+        /// <summary>
         /// Get a WorldObject instance by its ID.
         /// </summary>
         /// <param name="id">The ID of the WorldObject instance to get.</param>

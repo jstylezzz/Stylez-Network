@@ -11,6 +11,7 @@ namespace StylezDedicatedServer.Threading
     public class MyThreadManager
     {
         public static MyThreadManager Instance { get; private set; }
+        public bool ThreadingRunning { get { return m_running; } }
 
         private bool m_running = true;
         private Queue<Action> m_clientListenerThreadQueue = new Queue<Action>();

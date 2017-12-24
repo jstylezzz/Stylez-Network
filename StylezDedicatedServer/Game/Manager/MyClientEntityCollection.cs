@@ -18,27 +18,20 @@ namespace StylezDedicatedServer.Game.Manager
         { 
             m_ownedWorldObjectIds.Add(id);
             OwnedObjects = m_ownedWorldObjectIds.ToArray();
-            AddRangedObject(id); //Temporary, until ranged system is in place
         }
 
         public void RemoveOwnedObject(int id)
         {
             m_ownedWorldObjectIds.Remove(id);
             OwnedObjects = m_ownedWorldObjectIds.ToArray();
-            RemoveRangedObject(id); //Temporary, until ranged system is in place
         }
 
-        public void AddRangedObject(int id)
+        public void UpdateRangedObjectList(int[] newList)
         {
-            m_objectsInRange.Add(id);
+            m_objectsInRange.Clear();
+            m_objectsInRange.TrimExcess();
+            m_objectsInRange.AddRange(newList);
             RangedObjects = m_objectsInRange.ToArray();
         }
-
-        public void RemoveRangedObject(int id)
-        {
-            m_objectsInRange.Remove(id);
-            RangedObjects = m_objectsInRange.ToArray();
-        }
-
     }
 }

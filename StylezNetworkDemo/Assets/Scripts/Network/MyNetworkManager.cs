@@ -37,6 +37,9 @@ namespace StylezNetworkDemo.Network
         private List<GameObject> m_objectList = new List<GameObject>();
 
         private bool m_performUpdates = false;
+        private bool m_areaUpdateAnswered = true;
+
+        private Vector3 m_camPos;
 
         /// <summary>
         /// Script entry point.
@@ -126,7 +129,12 @@ namespace StylezNetworkDemo.Network
         {
             while(m_performUpdates)
             {
-                m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.WORLD_AREA_UPDATE));
+                if (m_areaUpdateAnswered == true)
+                {
+
+                    m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.WORLD_AREA_UPDATE, JsonConvert.SerializeObject(new MyAreaUpdateRequest(m_netClient.ClientID, m_camPos.x, m_camPos.y, 0, 0, 10))));
+                    m_areaUpdateAnswered = false;
+                }
                 Thread.Sleep(1000);
                 if (!m_performUpdates) break;
             }
@@ -151,7 +159,8 @@ namespace StylezNetworkDemo.Network
                         break;
                     }
                     case EMyNetworkCommands.WORLD_AREA_UPDATE:
-                    { 
+                    {
+                        m_areaUpdateAnswered = true;
                         PerformAreaUpdate(JsonConvert.DeserializeObject<MyAreaUpdate>(message.CommandJSON));
                         break;
                     }
@@ -164,6 +173,7 @@ namespace StylezNetworkDemo.Network
         /// </summary>
         private void Update()
         {
+            m_camPos = Camera.main.transform.position;
             ProcessCommandsAndActions();
         }
     }

@@ -49,6 +49,7 @@
     <Compile Include="Commands\MyNetCommand.cs" />
     <Compile Include="Game\Commands\EMyNetworkCommands.cs" />
     <Compile Include="Game\Commands\MyAreaUpdate.cs" />
+    <Compile Include="Game\Commands\MyAreaUpdateRequest.cs" />
     <Compile Include="Game\Commands\MyClientAuthCommand.cs" />
     <Compile Include="Game\World\Objects\MyMovementData.cs" />
     <Compile Include="Game\World\Objects\MyWorldObject.cs" />
