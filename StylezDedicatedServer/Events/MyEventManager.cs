@@ -9,12 +9,14 @@ namespace StylezDedicatedServer.Events
 {
 
     public delegate void OnServerShutdownEventDelegate();
+    public delegate void OnGameLogicUpdateEventDelegate();
 
     public class MyEventManager
     {
         public static MyEventManager Instance { get; private set; }
 
         public event OnServerShutdownEventDelegate OnServerShutdown;
+        public event OnGameLogicUpdateEventDelegate OnGameLogicUpdate;
 
         public MyEventManager()
         {
@@ -25,6 +27,11 @@ namespace StylezDedicatedServer.Events
         public void FireShutdownEvent()
         {
             OnServerShutdown?.Invoke();
+        }
+
+        public void PerformGameLogicUpdate()
+        {
+            OnGameLogicUpdate?.Invoke();
         }
     }
 }

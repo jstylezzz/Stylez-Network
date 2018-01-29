@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using StylezNetworkShared.Logging;
 using StylezDedicatedServer.Events;
+using System.Diagnostics;
 
 namespace StylezDedicatedServer.Threading
 {
@@ -14,7 +15,6 @@ namespace StylezDedicatedServer.Threading
         public bool ThreadingRunning { get { return m_running; } }
 
         private bool m_running = true;
-        private Queue<Action> m_clientListenerThreadQueue = new Queue<Action>();
 
         public MyThreadManager()
         {
@@ -29,7 +29,19 @@ namespace StylezDedicatedServer.Threading
 
         private void StartThreads()
         {
-     
+            new Thread(ThreadedGameLogicLoop).Start();
+        }
+
+        /// <summary>
+        /// We run custom game logic from a separate thread.
+        /// </summary>
+        private void ThreadedGameLogicLoop()
+        {
+            while(m_running)
+            {     
+                MyEventManager.Instance.PerformGameLogicUpdate();
+                Thread.Sleep(1000);
+            }
         }
 
         private void OnServerShutdown()
