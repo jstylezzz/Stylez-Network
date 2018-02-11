@@ -34,10 +34,10 @@ namespace StylezNetworkDemo.Network
         private Queue<Action> m_actionList = new Queue<Action>();
         private static Queue<MyNetCommand> m_netCommands = new Queue<MyNetCommand>();
 
-        private List<GameObject> m_objectList = new List<GameObject>();
-
         private bool m_performUpdates = false;
         private bool m_areaUpdateAnswered = true;
+
+        private MyNetObjectManager m_netObjectManager = new MyNetObjectManager();
 
         private Vector3 m_camPos;
 
@@ -83,26 +83,41 @@ namespace StylezNetworkDemo.Network
         private void PerformAreaUpdate(MyAreaUpdate u)
         {
             if (u.WorldObjects == null) return;
-            //Empty list for objects we keep
-            List<GameObject> newObjects = new List<GameObject>();
+
+            Dictionary<int, MySyncedObject> existingObjects = m_netObjectManager.GetAll();
 
             //List copied from the current object list
-            List<GameObject> deleteObjects = new List<GameObject>(m_objectList);
+            Dictionary<int, MySyncedObject> deleteObjects = new Dictionary<int, MySyncedObject>(existingObjects);
 
+            GameObject g;
+            MySyncedObject so;
             //Loop through all the objects in range. 
             //Objects that are in range are removed from the deleteObjects list.
             //We will be left with a list consisting of objects that are no longer in range.
             foreach (MyWorldObject p in u.WorldObjects)
             {
-                GameObject g = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                g.transform.position = new Vector3(p.ObjectPosition.x, p.ObjectPosition.y, p.ObjectPosition.z);
-                newObjects.Add(g);
-                deleteObjects.Remove(g);
+                bool exists = m_netObjectManager.Contains(p.ObjectID);
+
+                //New object. Add SyncedObject component to it and initialize it.
+                if (exists == false)
+                {
+                    g = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    g.transform.position = new Vector3(p.ObjectPosition.x, p.ObjectPosition.y, p.ObjectPosition.z);
+                    so = g.AddComponent<MySyncedObject>();
+                    so.InitializeObject(p);
+                }
+                else //Exists, remove it from the objects to delete
+                {
+                    existingObjects[p.ObjectID].UpdateWorldObjectInstance(p);
+                    deleteObjects.Remove(p.ObjectID);
+                }
             }
 
             //Now we delete those objects
-            foreach (GameObject g in deleteObjects) Destroy(g);
-            m_objectList = newObjects; //And assign our updated list as active objects list.
+            foreach (KeyValuePair<int, MySyncedObject> kv in deleteObjects)
+            {
+                kv.Value.DeleteObject();
+            }
         }
 
         /// <summary>
