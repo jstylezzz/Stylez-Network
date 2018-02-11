@@ -15,6 +15,7 @@ using StylezNetworkShared.Game.Commands;
 using System.Threading;
 using StylezNetworkShared.Game.World.Objects;
 using Newtonsoft.Json;
+using StylezNetworkDemo.Manager;
 
 namespace StylezNetworkDemo.Network
 {
@@ -23,6 +24,9 @@ namespace StylezNetworkDemo.Network
     /// </summary>
     public class MyNetworkManager : MonoBehaviour
     {
+        public static MyNetworkManager Instance { get; private set; }
+        public MyNetworkClient NetClient { get { return m_netClient; } }
+
         [SerializeField]
         private string m_ip = "127.0.0.1";
 
@@ -46,6 +50,9 @@ namespace StylezNetworkDemo.Network
         /// </summary>
         private void Start()
         {
+            if (Instance == null) Instance = this;
+            else return;
+
             Debug.Log($"Starting the NetClient on {m_ip}:{m_port}.");
             m_netClient = new MyNetworkClient(EMyNetClientMode.MODE_CLIENTSIDE);
             m_netClient.OnConnectedToServer += OnServerConnectComplete;
@@ -65,7 +72,7 @@ namespace StylezNetworkDemo.Network
                 m_netClient.OnDisconnectFromServer += OnDisconnect;
                 m_netClient.OnTransmissionReceivedClient += OnTransmissionReceived;
                 
-                m_netClient.SendTransmission(new StylezNetworkShared.Commands.MyNetCommand((int)EMyNetworkCommands.AUTHENTICATE));
+                m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.AUTHENTICATE));
             }
             else Debug.LogWarning("Connection to the server has failed.");
         }
@@ -101,9 +108,9 @@ namespace StylezNetworkDemo.Network
                 //New object. Add SyncedObject component to it and initialize it.
                 if (exists == false)
                 {
-                    g = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    g = Instantiate(MyPrefabManager.Instance.Get(p.ObjectPrefabName));
                     g.transform.position = new Vector3(p.ObjectPosition.x, p.ObjectPosition.y, p.ObjectPosition.z);
-                    so = g.AddComponent<MySyncedObject>();
+                    so = g.GetComponent<MySyncedObject>();
                     so.InitializeObject(p);
                 }
                 else //Exists, remove it from the objects to delete
@@ -127,6 +134,7 @@ namespace StylezNetworkDemo.Network
         {
             m_performUpdates = false;
             m_netClient.OnDisconnectFromServer -= OnDisconnect;
+            m_netClient.OnTransmissionReceivedClient -= OnTransmissionReceived;
             Debug.LogWarning("Disconnected from the server.");
         }
 
@@ -140,7 +148,7 @@ namespace StylezNetworkDemo.Network
             if (m_netClient.IsConnected) m_netClient.Disconnect();
         }
 
-        private void SendAreaUpdate()
+        private void SendAreaUpdateRequest()
         {
             while(m_performUpdates)
             {
@@ -151,6 +159,22 @@ namespace StylezNetworkDemo.Network
                     m_areaUpdateAnswered = false;
                 }
                 Thread.Sleep(1000);
+                if (!m_performUpdates) break;
+            }
+        }
+
+        private void SendAreaUpdate()
+        {
+            MyWorldObject[] updates;
+
+            while (m_performUpdates)
+            {
+                updates = MyNetObjectManager.Instance.GetLocalMovementUpdateObjects();
+                if(updates.Length > 0)
+                {
+                    m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.MAKE_WORLD_AREA_UPDATE, JsonConvert.SerializeObject(new MyAreaUpdate(updates.Length, updates))));
+                }
+                Thread.Sleep(250);
                 if (!m_performUpdates) break;
             }
         }
@@ -169,8 +193,9 @@ namespace StylezNetworkDemo.Network
                         m_netClient.AuthClient(cmd.ClientID, cmd.AuthCode);
                         m_netClient.SetAuthenticated(true);
                         m_performUpdates = true;
+                        new Thread(SendAreaUpdateRequest).Start();
                         new Thread(SendAreaUpdate).Start();
-                        m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.SPAWN_OBJECT, JsonConvert.SerializeObject(new MyWorldObject(5, 10, 0, "PlayerObject", true))));
+                        m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.SPAWN_OBJECT, JsonConvert.SerializeObject(new MyWorldObject(0, 0, 0, "PlayerObject", true))));
                         break;
                     }
                     case EMyNetworkCommands.WORLD_AREA_UPDATE:
@@ -188,7 +213,7 @@ namespace StylezNetworkDemo.Network
         /// </summary>
         private void Update()
         {
-            m_camPos = Camera.main.transform.position;
+            m_camPos = (Camera.main == null) ? Vector3.zero : Camera.main.transform.root.position;
             ProcessCommandsAndActions();
         }
     }

@@ -32,6 +32,12 @@ namespace StylezNetworkShared.Game.Commands
         /// Serverside: Send the list of objects in range to the client.
         /// Clientside: Update existing objects, spawn new objects, delete removed objects.
         /// </summary>
-        WORLD_AREA_UPDATE
+        WORLD_AREA_UPDATE,
+
+        /// <summary>
+        /// Serverside: Receive data on changed objects by the client.
+        /// Clientside: Nothing.
+        /// </summary>
+        MAKE_WORLD_AREA_UPDATE
     }
 }

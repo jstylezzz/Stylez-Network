@@ -8,6 +8,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using StylezNetworkShared.Game.World.Objects;
 
 namespace StylezNetworkDemo.Network
 {
@@ -34,6 +35,17 @@ namespace StylezNetworkDemo.Network
         public bool Contains(MySyncedObject so)
         {
             return m_syncedObjectDict.ContainsValue(so);
+        }
+
+        public MyWorldObject[] GetLocalMovementUpdateObjects()
+        {
+            List<MyWorldObject> so = new List<MyWorldObject>();
+            foreach (KeyValuePair<int, MySyncedObject> kv in m_syncedObjectDict)
+            {
+                if (kv.Value.DataChangedLocally) so.Add(kv.Value.ExportWorldObjectData());
+            }
+
+            return so.ToArray();
         }
 
         /// <summary>

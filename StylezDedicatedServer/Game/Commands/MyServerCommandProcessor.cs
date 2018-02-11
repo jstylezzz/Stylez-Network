@@ -57,6 +57,16 @@ namespace StylezDedicatedServer.Game.Commands
                         MyClientWorldManager.Instance.PerformClientAreaUpdate(JsonConvert.DeserializeObject<MyAreaUpdateRequest>(cmd.CommandJSON));
                         break;
                     }
+                    case EMyNetworkCommands.MAKE_WORLD_AREA_UPDATE:
+                    {
+                        MyAreaUpdate aud = JsonConvert.DeserializeObject<MyAreaUpdate>(cmd.CommandJSON);
+                        for (int i = 0, len = aud.ObjectAmount; i < len; i++)
+                        {
+                            MyServerWorldManager.Instance.UpdateObject(aud.WorldObjects[i]);
+                        }
+
+                        break;
+                    }
                     default:
                     {
                         MyLogger.LogError($"Client ID {fromClient.ClientID} attempted to execute an invalid command (ID: {cmd.CommandID}).");

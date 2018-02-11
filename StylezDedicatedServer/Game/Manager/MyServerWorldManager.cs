@@ -129,5 +129,15 @@ namespace StylezDedicatedServer.Game.Manager
         {
             return m_worldObjectRegistry[id];
         }
+
+        /// <summary>
+        /// Update a WorldObject's data
+        /// </summary>
+        /// <param name="o">The object update data.</param>
+        public void UpdateObject(MyWorldObject o)
+        {
+            m_worldObjectRegistry[o.ObjectID].MovementData = o.MovementData;
+            m_worldObjectRegistry[o.ObjectID].ObjectPosition = o.ObjectPosition;
+        }
     }
 }
