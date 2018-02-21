@@ -37,12 +37,12 @@ namespace StylezNetworkDemo.Network
             return m_syncedObjectDict.ContainsValue(so);
         }
 
-        public MyWorldObject[] GetLocalMovementUpdateObjects()
+        public MyWorldObject[] GetLocalObjectsForUpdate()
         {
             List<MyWorldObject> so = new List<MyWorldObject>();
             foreach (KeyValuePair<int, MySyncedObject> kv in m_syncedObjectDict)
             {
-                if (kv.Value.DataChangedLocally) so.Add(kv.Value.ExportWorldObjectData());
+                if (kv.Value.IsALocalObject) so.Add(kv.Value.ExportWorldObjectData());
             }
 
             return so.ToArray();

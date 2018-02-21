@@ -22,7 +22,8 @@ namespace StylezNetworkDemo.Player
         private float m_speed;
 
         private MySyncedObject m_syncedObject;
-        private Vector4 m_cachedKeyStates = Vector4.zero;
+        private Vector2 m_currentMovement = Vector2.zero;
+        private Vector2 m_cachedMovement = Vector2.zero;
 
         /// <summary>
         /// Script entry point.
@@ -37,63 +38,20 @@ namespace StylezNetworkDemo.Player
         /// </summary>
         private void Update()
         {
-            Vector3 md = Vector3.zero;
-            bool stateChanged = false;
+            if (Input.GetKey(KeyCode.W)) m_currentMovement.y = m_speed;
+            else if (Input.GetKey(KeyCode.S)) m_currentMovement.y = -m_speed;
+            else m_currentMovement.y = 0;
 
-            if(Input.GetKeyDown(KeyCode.W))
-            {
-                md.y = m_speed;
-                m_cachedKeyStates.x = 1;
-                stateChanged = true;
-            }
-            else if(Input.GetKeyUp(KeyCode.W))
-            {
-                m_cachedKeyStates.x = 0;
-                stateChanged = true;
-            }
-
-            if (Input.GetKeyDown(KeyCode.S))
-            {
-                md.y = -m_speed;
-                m_cachedKeyStates.y = 1;
-                stateChanged = true;
-            }
-            else if (Input.GetKeyUp(KeyCode.S))
-            {
-                m_cachedKeyStates.y = 0;
-                stateChanged = true;
-            }
-
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                md.x = -m_speed;
-                m_cachedKeyStates.z = 1;
-                stateChanged = true;
-            }
-            else if (Input.GetKeyUp(KeyCode.A))
-            {
-                m_cachedKeyStates.z = 0;
-                stateChanged = true;
-            }
-
-            if (Input.GetKeyDown(KeyCode.D))
-            {
-                md.x = m_speed;
-                m_cachedKeyStates.w = 1;
-                stateChanged = true;
-            }
-            else if (Input.GetKeyUp(KeyCode.D))
-            {
-                m_cachedKeyStates.w = 0;
-                stateChanged = true;
-            }
-
-            if(stateChanged)
+            if (Input.GetKey(KeyCode.D)) m_currentMovement.x= m_speed;
+            else if (Input.GetKey(KeyCode.A)) m_currentMovement.x = -m_speed;
+            else m_currentMovement.x = 0;
+            Debug.Log(Input.GetKey(KeyCode.D));
+            if (m_currentMovement != m_cachedMovement)
             {
                 //If still moving, a direction change has occured. Update.
                 if(IsStillMoving())
                 {
-                    m_syncedObject.UpdateMovementLocal(md, m_speed, Time.time);
+                    m_syncedObject.UpdateMovementLocal(m_currentMovement, m_speed, Time.time);
                 }
                 else //Not moving anymore, send stop signal.
                 {
@@ -101,11 +59,12 @@ namespace StylezNetworkDemo.Player
                     m_syncedObject.UpdateMovementLocal(Vector3.zero, 0, Time.time);
                 }
             }
+            m_cachedMovement = m_currentMovement;
         }
 
         private bool IsStillMoving()
         {
-            if (m_cachedKeyStates.x != 0 || m_cachedKeyStates.y != 0 || m_cachedKeyStates.z != 0 || m_cachedKeyStates.w != 0) return true;
+            if (m_currentMovement.sqrMagnitude != 0) return true;
             else return false;
         }
     }

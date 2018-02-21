@@ -169,7 +169,7 @@ namespace StylezNetworkDemo.Network
 
             while (m_performUpdates)
             {
-                updates = MyNetObjectManager.Instance.GetLocalMovementUpdateObjects();
+                updates = MyNetObjectManager.Instance.GetLocalObjectsForUpdate();
                 if(updates.Length > 0)
                 {
                     m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.MAKE_WORLD_AREA_UPDATE, JsonConvert.SerializeObject(new MyAreaUpdate(updates.Length, updates))));

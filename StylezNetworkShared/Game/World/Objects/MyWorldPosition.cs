@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace StylezNetworkShared.Game.World.Objects
 {
     [Serializable]
-    public struct MyWorldPosition
+    public class MyWorldPosition
     {
         public float x { get; set; }
         public float y { get; set; }
@@ -48,6 +48,11 @@ namespace StylezNetworkShared.Game.World.Objects
             this.x = x;
             this.y = y;
             this.z = z;
+        }
+
+        public MyWorldPosition()
+        {
+           //Json constructor
         }
     }
 }

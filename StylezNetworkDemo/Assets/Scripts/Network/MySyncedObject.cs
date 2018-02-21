@@ -26,14 +26,10 @@ namespace StylezNetworkDemo.Network
 
         public GameObject PhysicalObject { get { return gameObject; } }
 
-        public bool DataChangedLocally
-        {
-            get
-            {
-                return (m_dataChangedLocally || m_worldObjectInstance.MovementData.IsMoving);
-            }
-            set { m_dataChangedLocally = false; }
-        }
+        /// <summary>
+        /// A local object is an object managed by the local game.
+        /// </summary>
+        public bool IsALocalObject { get { return (Utiliy.MyOwnershipUtility.GetObjectOwner(m_worldObjectInstance) == Utiliy.EMyMultiplayerSide.SIDE_SELF); } }
 
         #endregion
 
@@ -77,9 +73,10 @@ namespace StylezNetworkDemo.Network
 
         public void UpdateWorldObjectInstance(MyWorldObject wo)
         {
-            if (DataChangedLocally) return; //Only update if the locally changed data is already exported, or if there is none
+            if (Utiliy.MyOwnershipUtility.GetObjectOwner(m_worldObjectInstance) == Utiliy.EMyMultiplayerSide.SIDE_SELF) return; //Only update if the locally changed data is already exported, or if there is none
             m_worldObjectInstance = wo;
-            if(!m_worldObjectInstance.MovementData.IsMoving) transform.position = new Vector3(wo.ObjectPosition.x, wo.ObjectPosition.y, wo.ObjectPosition.z);
+
+            transform.position = new Vector3(wo.ObjectPosition.x, wo.ObjectPosition.y, wo.ObjectPosition.z);
         }
 
         public void DeleteObject()
@@ -90,30 +87,31 @@ namespace StylezNetworkDemo.Network
 
         public void UpdateMovementLocal(Vector3 direction, float speed, float atTime)
         {
-            m_worldObjectInstance.MovementData = new MyMovementData(direction.x, direction.y, direction.z, speed, atTime, (speed != 0));
-            DataChangedLocally = true;
+            m_worldObjectInstance.MovementData.UpdateMovement(direction.x, direction.y, direction.z, speed);
         }
 
         public MyMovementData ExportMovementData()
         {
-            DataChangedLocally = false;
             return m_worldObjectInstance.MovementData;
         }
 
         public MySyncedObject ExportData()
         {
-            DataChangedLocally = false;
             return this;
         }
 
         public MyWorldObject ExportWorldObjectData()
         {
-            DataChangedLocally = false;
             return m_worldObjectInstance;
         }
 
         public void StoppedMoving()
         {
+            MyMovementData movData = m_worldObjectInstance.MovementData;
+
+            m_worldObjectInstance.MovementData.StopAllMovement();
+            Debug.Log($"STOP! {movData.Speed}, {movData.XDirection}, {movData.YDirection}");
+
             m_worldObjectInstance.ObjectPosition = new MyWorldPosition(transform.position.x, transform.position.y, transform.position.z, m_worldObjectInstance.ObjectPosition.Dimension);
         }
 
@@ -123,7 +121,9 @@ namespace StylezNetworkDemo.Network
 
         protected virtual void OnUpdate()
         {
+            
             MyMovementData movData = m_worldObjectInstance.MovementData;
+            Debug.Log($"{movData.Speed}, {movData.XDirection}, {movData.YDirection}");
             if (movData.IsMoving)
             {
                 transform.Translate((new Vector3(movData.XDirection, movData.YDirection, movData.ZDirection) * movData.Speed) * Time.deltaTime);

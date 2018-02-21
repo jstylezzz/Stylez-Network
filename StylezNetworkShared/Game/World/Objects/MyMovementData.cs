@@ -3,46 +3,54 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace StylezNetworkShared.Game.World.Objects
 {
     [Serializable]
-    public struct MyMovementData
+    public class MyMovementData
     {
         /// <summary>
         /// The time the movement started.
         /// </summary>
-        public float TimeStarted { get; }
+        [JsonProperty]
+        public float TimeStarted { get; private set; }
 
         /// <summary>
         /// The time this transmission was sent.
         /// </summary>
-        public float TimeUpdated { get; }
+        [JsonProperty]
+        public float TimeUpdated { get; private set; }
 
         /// <summary>
         /// The speed of the movement;
         /// </summary>
-        public float Speed { get; }
+        [JsonProperty]
+        public float Speed { get; private set; }
 
         /// <summary>
         /// The X direction of the movement.
         /// </summary>
-        public float XDirection { get; }
+        [JsonProperty]
+        public float XDirection { get; private set; }
 
         /// <summary>
         /// The Y direction of the movement.
         /// </summary>
-        public float YDirection { get; }
+        [JsonProperty]
+        public float YDirection { get; private set; }
 
         /// <summary>
         /// The Z direction of the movement.
         /// </summary>
-        public float ZDirection { get; }
+        [JsonProperty]
+        public float ZDirection { get; private set; }
 
         /// <summary>
         /// Is the object moving?
         /// </summary>
-        public bool IsMoving { get; }
+        [JsonProperty]
+        public bool IsMoving { get; private set; }
 
         /// <summary>
         /// Create a new instance of movement data.
@@ -81,6 +89,28 @@ namespace StylezNetworkShared.Game.World.Objects
             ZDirection = zDir;
             Speed = speed;
             IsMoving = isMoving;
+        }
+
+        public void UpdateMovement(float xDir, float yDir, float zDir, float speed, bool moving = true)
+        {
+            XDirection = xDir;
+            YDirection = yDir;
+            ZDirection = zDir;
+            IsMoving = moving;
+        }
+
+        public void StopAllMovement()
+        {
+            XDirection = 0f;
+            YDirection = 0f;
+            ZDirection = 0f;
+            Speed = 0f;
+            IsMoving = false;
+        }
+
+        public MyMovementData()
+        {
+            //Json constructor
         }
     }
 }
