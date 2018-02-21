@@ -19,7 +19,7 @@ namespace StylezNetworkDemo.Network
     {
         public static MyNetObjectManager Instance { get; private set; }
 
-        private static Dictionary<int, MySyncedObject> m_syncedObjectDict = new Dictionary<int, MySyncedObject>();
+        private static Dictionary<int, MyNetworkedObject> m_syncedObjectDict = new Dictionary<int, MyNetworkedObject>();
 
         public MyNetObjectManager()
         {
@@ -32,7 +32,7 @@ namespace StylezNetworkDemo.Network
             return m_syncedObjectDict.ContainsKey(id);
         }
 
-        public bool Contains(MySyncedObject so)
+        public bool Contains(MyNetworkedObject so)
         {
             return m_syncedObjectDict.ContainsValue(so);
         }
@@ -40,9 +40,9 @@ namespace StylezNetworkDemo.Network
         public MyWorldObject[] GetLocalObjectsForUpdate()
         {
             List<MyWorldObject> so = new List<MyWorldObject>();
-            foreach (KeyValuePair<int, MySyncedObject> kv in m_syncedObjectDict)
+            foreach (KeyValuePair<int, MyNetworkedObject> kv in m_syncedObjectDict)
             {
-                if (kv.Value.IsALocalObject) so.Add(kv.Value.ExportWorldObjectData());
+                if (kv.Value.IsALocalObject) so.Add(kv.Value.WorldObject);
             }
 
             return so.ToArray();
@@ -53,7 +53,7 @@ namespace StylezNetworkDemo.Network
         /// </summary>
         /// <param name="id">The ID of the SyncedObject.</param>
         /// <returns>SyncedObject instance or null.</returns>
-        public MySyncedObject Get(int id)
+        public MyNetworkedObject Get(int id)
         {
             if (!Contains(id)) return null;
             else return m_syncedObjectDict[id];
@@ -64,15 +64,15 @@ namespace StylezNetworkDemo.Network
         /// </summary>
         /// <param name="instance">The instance of the SyncedObject.</param>
         /// <returns>ID of SyncedObject or -1 if not exist</returns>
-        public int Get(MySyncedObject instance)
+        public int Get(MyNetworkedObject instance)
         {
             if (!Contains(instance)) return -1;
-            else return instance.ObjectID;
+            else return instance.WorldObject.ObjectID;
         }
 
-        public Dictionary<int, MySyncedObject> GetAll()
+        public Dictionary<int, MyNetworkedObject> GetAll()
         {
-            return new Dictionary<int, MySyncedObject>(m_syncedObjectDict);
+            return new Dictionary<int, MyNetworkedObject>(m_syncedObjectDict);
         }
 
         public int[] GetAllIDs()
@@ -82,7 +82,7 @@ namespace StylezNetworkDemo.Network
             int[] all = new int[m_syncedObjectDict.Count];
             int i = 0;
 
-            foreach (KeyValuePair<int, MySyncedObject> kv in m_syncedObjectDict)
+            foreach (KeyValuePair<int, MyNetworkedObject> kv in m_syncedObjectDict)
             {
                 all[i] = kv.Key;
                 i++;
@@ -97,19 +97,19 @@ namespace StylezNetworkDemo.Network
 
             GameObject[] ga = new GameObject[m_syncedObjectDict.Count];
             int i = 0;
-            foreach (KeyValuePair<int, MySyncedObject> kv in m_syncedObjectDict)
+            foreach (KeyValuePair<int, MyNetworkedObject> kv in m_syncedObjectDict)
             {
-                ga[i] = kv.Value.PhysicalObject;
+                ga[i] = kv.Value.gameObject;
                 i++;
             }
 
             return ga;
         }
 
-        public void Register(MySyncedObject instance)
+        public void Register(MyNetworkedObject instance)
         {
-            if (!Contains(instance.ObjectID)) m_syncedObjectDict.Add(instance.ObjectID, instance);
-            else Debug.LogWarning($"[WARN]: Object with ID {instance.ObjectID} already registered.");
+            if (!Contains(instance.WorldObject.ObjectID)) m_syncedObjectDict.Add(instance.WorldObject.ObjectID, instance);
+            else Debug.LogWarning($"[WARN]: Object with ID {instance.WorldObject.ObjectID} already registered.");
         }
 
         public void Unregister(int id)
@@ -118,10 +118,10 @@ namespace StylezNetworkDemo.Network
             else Debug.LogWarning($"[WARN]: Object ID with ID {id} is not registered.");
         }
 
-        public void Unregister(MySyncedObject instance)
+        public void Unregister(MyNetworkedObject instance)
         {
-            if (Contains(instance.ObjectID)) m_syncedObjectDict.Remove(instance.ObjectID);
-            else Debug.LogWarning($"[WARN]: Object ID with ID {instance.ObjectID} is not registered.");
+            if (Contains(instance.WorldObject.ObjectID)) m_syncedObjectDict.Remove(instance.WorldObject.ObjectID);
+            else Debug.LogWarning($"[WARN]: Object ID with ID {instance.WorldObject.ObjectID} is not registered.");
         }
     }
 }

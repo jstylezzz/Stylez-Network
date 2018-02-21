@@ -42,6 +42,7 @@ GameObject:
   - component: {fileID: 114052331732524462}
   - component: {fileID: 50049059794692312}
   - component: {fileID: 58696135938282118}
+  - component: {fileID: 114609700809714832}
   m_Layer: 0
   m_Name: PlayerObject
   m_TagString: Untagged
@@ -171,7 +172,7 @@ MonoBehaviour:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1663473371952226}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e7dc8d36c8982fa4bb5c4ae69c305810, type: 3}
   m_Name: 
@@ -180,6 +181,23 @@ MonoBehaviour:
   - {fileID: 1467381026321306}
   - {fileID: 50049059794692312}
   - {fileID: 114027756889484314}
+--- !u!114 &114609700809714832
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1663473371952226}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aaeaac5facdf28b4287a6d0c74e70549, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_objectsToDeleteRemote:
+  - {fileID: 50049059794692312}
+  - {fileID: 114027756889484314}
+  - {fileID: 1467381026321306}
+  m_maxDistanceForInterpolate: 40
+  m_interpolationMaxTimeSeconds: 4
 --- !u!124 &124372812686456870
 Behaviour:
   m_ObjectHideFlags: 1

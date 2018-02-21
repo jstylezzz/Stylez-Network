@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using StylezNetworkDemo.Network;
 using StylezNetworkShared.Network;
+using StylezNetworkShared.Game.World.Objects;
 
 namespace StylezNetworkDemo.Player
 {
@@ -21,9 +22,10 @@ namespace StylezNetworkDemo.Player
         [SerializeField]
         private float m_speed;
 
-        private MySyncedObject m_syncedObject;
+        private MyNetworkedObject m_syncedObject;
         private Vector2 m_currentMovement = Vector2.zero;
         private Vector2 m_cachedMovement = Vector2.zero;
+        private float m_moveStartTime;
 
         private bool m_jumping = false;
         private int m_jumpFrames = 0;
@@ -33,7 +35,7 @@ namespace StylezNetworkDemo.Player
         /// </summary>
         private void Start()
         {
-            m_syncedObject = GetComponent<MySyncedObject>();
+            m_syncedObject = GetComponent<MyNetworkedObject>();
         }
 
         /// <summary>
@@ -69,12 +71,13 @@ namespace StylezNetworkDemo.Player
                 //If still moving, a direction change has occured. Update.
                 if(IsStillMoving())
                 {
-                    m_syncedObject.UpdateMovementLocal(m_currentMovement, m_speed, Time.time);
+                    if (m_moveStartTime == -1) m_moveStartTime = Time.time;
+                    m_syncedObject.UpdateNetworkedObjectForces(new MyMovementData(m_currentMovement.x, m_currentMovement.y, 0, m_speed, m_moveStartTime, true));
                 }
                 else //Not moving anymore, send stop signal.
                 {
-                    m_syncedObject.StoppedMoving();
-                    m_syncedObject.UpdateMovementLocal(Vector3.zero, 0, Time.time);
+                    m_moveStartTime = -1;
+                    m_syncedObject.NullifyNetworkedObjectForces();
                 }
             }
             m_cachedMovement = m_currentMovement;

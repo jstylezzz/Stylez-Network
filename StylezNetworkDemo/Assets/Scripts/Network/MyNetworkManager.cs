@@ -95,13 +95,13 @@ namespace StylezNetworkDemo.Network
         {
             if (u.WorldObjects == null) return;
 
-            Dictionary<int, MySyncedObject> existingObjects = m_netObjectManager.GetAll();
+            Dictionary<int, MyNetworkedObject> existingObjects = m_netObjectManager.GetAll();
 
             //List copied from the current object list
-            Dictionary<int, MySyncedObject> deleteObjects = new Dictionary<int, MySyncedObject>(existingObjects);
+            Dictionary<int, MyNetworkedObject> deleteObjects = new Dictionary<int, MyNetworkedObject>(existingObjects);
 
             GameObject g;
-            MySyncedObject so;
+            MyNetworkedObject so;
             //Loop through all the objects in range. 
             //Objects that are in range are removed from the deleteObjects list.
             //We will be left with a list consisting of objects that are no longer in range.
@@ -114,18 +114,18 @@ namespace StylezNetworkDemo.Network
                 {
                     g = Instantiate(MyPrefabManager.Instance.Get(p.ObjectPrefabName));
                     g.transform.position = new Vector3(p.ObjectPosition.x, p.ObjectPosition.y, p.ObjectPosition.z);
-                    so = g.GetComponent<MySyncedObject>();
-                    so.InitializeObject(p);
+                    so = g.GetComponent<MyNetworkedObject>();
+                    so.SetupNetworkedObject(p);
                 }
                 else //Exists, remove it from the objects to delete
                 {
-                    existingObjects[p.ObjectID].UpdateWorldObjectInstance(p);
+                    existingObjects[p.ObjectID].UpdateNetworkedObject(p);
                     deleteObjects.Remove(p.ObjectID);
                 }
             }
 
             //Now we delete those objects
-            foreach (KeyValuePair<int, MySyncedObject> kv in deleteObjects)
+            foreach (KeyValuePair<int, MyNetworkedObject> kv in deleteObjects)
             {
                 kv.Value.DeleteObject();
             }
