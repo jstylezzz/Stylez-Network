@@ -96,6 +96,7 @@ namespace StylezNetworkShared.Game.World.Objects
             XDirection = xDir;
             YDirection = yDir;
             ZDirection = zDir;
+            Speed = speed;
             IsMoving = moving;
         }
 
