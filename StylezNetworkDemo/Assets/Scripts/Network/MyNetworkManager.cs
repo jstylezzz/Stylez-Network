@@ -208,7 +208,7 @@ namespace StylezNetworkDemo.Network
                         m_performUpdates = true;
                         new Thread(SendAreaUpdateRequest).Start();
                         new Thread(SendAreaUpdate).Start();
-                        m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.SPAWN_OBJECT, JsonConvert.SerializeObject(new MyWorldObject(0, 0, 0, "PlayerObject", true))));
+                        m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.SPAWN_OBJECT, JsonConvert.SerializeObject(new MyWorldObject(0, 1, 0, "PlayerObject", true))));
                         break;
                     }
                     case EMyNetworkCommands.WORLD_AREA_UPDATE:

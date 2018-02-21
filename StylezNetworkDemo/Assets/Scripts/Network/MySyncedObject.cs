@@ -110,7 +110,7 @@ namespace StylezNetworkDemo.Network
             MyMovementData movData = m_worldObjectInstance.MovementData;
 
             m_worldObjectInstance.MovementData.StopAllMovement();
-            Debug.Log($"STOP! {movData.Speed}, {movData.XDirection}, {movData.YDirection}");
+            //Debug.Log($"STOP! {movData.Speed}, {movData.XDirection}, {movData.YDirection}");
 
             m_worldObjectInstance.ObjectPosition = new MyWorldPosition(transform.position.x, transform.position.y, transform.position.z, m_worldObjectInstance.ObjectPosition.Dimension);
         }
@@ -123,7 +123,7 @@ namespace StylezNetworkDemo.Network
         {
             
             MyMovementData movData = m_worldObjectInstance.MovementData;
-            Debug.Log($"{movData.Speed}, {movData.XDirection}, {movData.YDirection}");
+            //Debug.Log($"{movData.Speed}, {movData.XDirection}, {movData.YDirection}");
             if (movData.IsMoving)
             {
                 transform.Translate((new Vector3(movData.XDirection, movData.YDirection, movData.ZDirection) * movData.Speed) * Time.deltaTime);
