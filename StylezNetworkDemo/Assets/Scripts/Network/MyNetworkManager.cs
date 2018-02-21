@@ -26,6 +26,7 @@ namespace StylezNetworkDemo.Network
     {
         public static MyNetworkManager Instance { get; private set; }
         public MyNetworkClient NetClient { get { return m_netClient; } }
+        public float PingInMS { get; private set; } = 999f;
 
         [SerializeField]
         private string m_ip = "127.0.0.1";
@@ -44,6 +45,9 @@ namespace StylezNetworkDemo.Network
         private MyNetObjectManager m_netObjectManager = new MyNetObjectManager();
 
         private Vector3 m_camPos;
+
+        private bool m_waitingForPing = false;
+        private DateTime m_pingSent;
 
         /// <summary>
         /// Script entry point.
@@ -158,9 +162,18 @@ namespace StylezNetworkDemo.Network
                     m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.WORLD_AREA_UPDATE, JsonConvert.SerializeObject(new MyAreaUpdateRequest(m_netClient.ClientID, m_camPos.x, m_camPos.y, 0, 0, 10))));
                     m_areaUpdateAnswered = false;
                 }
-                Thread.Sleep(1000);
+
+                if (!m_waitingForPing) DoPingCheck();
+                Thread.Sleep(300);
                 if (!m_performUpdates) break;
             }
+        }
+
+        private void DoPingCheck()
+        {
+            m_waitingForPing = true;
+            m_pingSent = DateTime.Now;
+            m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.PERFORM_PING, " "));
         }
 
         private void SendAreaUpdate()
@@ -204,8 +217,19 @@ namespace StylezNetworkDemo.Network
                         PerformAreaUpdate(JsonConvert.DeserializeObject<MyAreaUpdate>(message.CommandJSON));
                         break;
                     }
+                    case EMyNetworkCommands.PERFORM_PING:
+                    {
+                        PingInMS = (DateTime.Now - m_pingSent).Milliseconds;
+                        m_waitingForPing = false;
+                        break;
+                    }
                 }
             }
+        }
+
+        private void OnGUI()
+        {
+            GUI.Label(new Rect(10, 10, 100, 100), $"Ping: {PingInMS} ms");
         }
 
         /// <summary>

@@ -38,6 +38,12 @@ namespace StylezNetworkShared.Game.Commands
         /// Serverside: Receive data on changed objects by the client.
         /// Clientside: Nothing.
         /// </summary>
-        MAKE_WORLD_AREA_UPDATE
+        MAKE_WORLD_AREA_UPDATE,
+
+        /// <summary>
+        /// Serverside: Send a ping reply. 
+        /// Clientside: Request a ping reply.
+        /// </summary>
+        PERFORM_PING
     }
 }

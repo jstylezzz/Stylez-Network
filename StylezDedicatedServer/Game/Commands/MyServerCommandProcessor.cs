@@ -67,6 +67,11 @@ namespace StylezDedicatedServer.Game.Commands
 
                         break;
                     }
+                    case EMyNetworkCommands.PERFORM_PING:
+                    {
+                        fromClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.PERFORM_PING, " "));
+                        break;
+                    }
                     default:
                     {
                         MyLogger.LogError($"Client ID {fromClient.ClientID} attempted to execute an invalid command (ID: {cmd.CommandID}).");
