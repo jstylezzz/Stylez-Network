@@ -5,12 +5,9 @@
 * 
 */
 
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using StylezNetworkShared.Game.World.Objects;
-using System;
 using StylezNetworkDemo.Utiliy;
+using System;
+using UnityEngine;
 
 namespace StylezNetworkDemo.Network
 {

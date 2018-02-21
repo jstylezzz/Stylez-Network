@@ -5,17 +5,15 @@
 * 
 */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using StylezNetworkShared.Network;
-using StylezNetworkShared.Commands;
-using StylezNetworkShared.Game.Commands;
-using System.Threading;
-using StylezNetworkShared.Game.World.Objects;
 using Newtonsoft.Json;
 using StylezNetworkDemo.Manager;
+using StylezNetworkShared.Commands;
+using StylezNetworkShared.Game.Commands;
+using StylezNetworkShared.Network;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using UnityEngine;
 
 namespace StylezNetworkDemo.Network
 {

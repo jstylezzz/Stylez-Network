@@ -5,9 +5,6 @@
 * 
 */
 
-using System.Collections;
-using System.Collections.Generic;
-using StylezNetworkShared.Game.World.Objects;
 using StylezNetworkDemo.Network;
 
 namespace StylezNetworkDemo.Utiliy
