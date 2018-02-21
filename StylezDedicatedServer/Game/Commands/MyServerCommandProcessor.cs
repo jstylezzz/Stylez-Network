@@ -9,8 +9,8 @@ using StylezNetworkShared.Commands;
 using StylezNetworkShared.Game.Commands;
 using Newtonsoft.Json;
 using StylezNetworkShared.Logging;
-using StylezNetworkShared.Game.World.Objects;
 using StylezDedicatedServer.Game.Manager;
+using StylezNetworkShared.Objects;
 
 namespace StylezDedicatedServer.Game.Commands
 {
@@ -44,11 +44,11 @@ namespace StylezDedicatedServer.Game.Commands
             {
                 switch ((EMyNetworkCommands)cmd.CommandID)
                 {
-                    case EMyNetworkCommands.SPAWN_OBJECT:
+                    case EMyNetworkCommands.SPAWN_DYNAMIC_OBJECT:
                     {
-                        MyWorldObject obj = JsonConvert.DeserializeObject<MyWorldObject>(cmd.CommandJSON);
-                        obj.OwnerID = fromClient.ClientID; //We set this here to prevent spoofing from the other end.
-                        MyServerWorldManager.Instance.RegisterObject(obj); //Register the object to the world manager. It will auto-broadcast when clients perform area updates.
+                        MyDynamicObject obj = JsonConvert.DeserializeObject<MyDynamicObject>(cmd.CommandJSON);
+                        obj.UpdateOwnerClientID(fromClient.ClientID); //We set this here to prevent spoofing from the other end.
+                        MyDedicatedServer.ServerObjectManager.RegisterDynamicObject(obj); //Register the object to the world manager. It will auto-broadcast when clients perform area updates.
                         
                         break;
                     }
@@ -57,12 +57,12 @@ namespace StylezDedicatedServer.Game.Commands
                         MyClientWorldManager.Instance.PerformClientAreaUpdate(JsonConvert.DeserializeObject<MyAreaUpdateRequest>(cmd.CommandJSON));
                         break;
                     }
-                    case EMyNetworkCommands.MAKE_WORLD_AREA_UPDATE:
+                    case EMyNetworkCommands.MAKE_DYNAMIC_WORLD_AREA_UPDATE:
                     {
-                        MyAreaUpdate aud = JsonConvert.DeserializeObject<MyAreaUpdate>(cmd.CommandJSON);
-                        for (int i = 0, len = aud.ObjectAmount; i < len; i++)
+                        MyDynamicObjectAreaUpdate aud = JsonConvert.DeserializeObject<MyDynamicObjectAreaUpdate>(cmd.CommandJSON);
+                        for (int i = 0, len = aud.DynamicObjectCount; i < len; i++)
                         {
-                            MyServerWorldManager.Instance.UpdateObject(aud.WorldObjects[i]);
+                            MyDedicatedServer.ServerObjectManager.UpdateDynamicObject(aud.DynamicObjects[i]);
                         }
 
                         break;

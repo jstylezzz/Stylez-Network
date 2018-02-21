@@ -1,15 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Newtonsoft.Json;
 using StylezDedicatedServer.Core;
-using StylezNetworkShared.Game.World.Objects;
-using StylezNetworkShared.Game.Commands;
-using System.Threading;
-using Newtonsoft.Json;
 using StylezDedicatedServer.Threading;
+using StylezNetworkShared.Game.Commands;
 using StylezNetworkShared.Logging;
+using StylezNetworkShared.Objects;
+using StylezNetworkShared.Commands;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace StylezDedicatedServer.Game.Manager
 {
@@ -30,8 +27,8 @@ namespace StylezDedicatedServer.Game.Manager
             if (Instance == null) Instance = this;
             else return;
 
-            MyServerWorldManager.Instance.OnObjectRegistered += OnObjectRegistered;
-            MyServerWorldManager.Instance.OnObjectUnregistered += OnObjectUnregistered;
+            MyDedicatedServer.ServerObjectManager.OnObjectAddedToRegistry += OnObjectRegistered;
+            MyDedicatedServer.ServerObjectManager.OnObjectRemovedFromRegistry += OnObjectUnregistered;
             MyClientManager.Instance.OnClientConnected += OnClientConnected;
             MyClientManager.Instance.OnClientDisconnected += OnClientDisconnected;
 
@@ -49,9 +46,9 @@ namespace StylezDedicatedServer.Game.Manager
             //Remove the collection for this client
             MyClientEntityCollection ec = m_clientEntityCollection[clientID];
             int[] o = ec.OwnedObjects;
-            foreach(MyWorldObject obj in MyServerWorldManager.Instance.GetObjects(o))
+            foreach(MyDynamicObject obj in MyDedicatedServer.ServerObjectManager.GetObjects(o))
             { 
-                if (obj.DestroyOnDisconnect == true) MyServerWorldManager.Instance.UnregisterObject(obj);
+                if (obj.DestroyOnOwnerDisconnect == true) MyDedicatedServer.ServerObjectManager.UnregisterDynamicObject(obj.ObjectID);
             }
             m_clientEntityCollection.Remove(clientID);
         }
@@ -59,13 +56,13 @@ namespace StylezDedicatedServer.Game.Manager
         private void OnObjectRegistered(int clientID, int objectID)
         {
             //If this object is owned by the given client ID, add it to their owned object collection.
-            if (MyServerWorldManager.Instance.GetObjectOwner(objectID) == clientID) m_clientEntityCollection[clientID].AddOwnedObject(objectID);
+            if (MyDedicatedServer.ServerObjectManager.GetObjectOwner(objectID) == clientID) m_clientEntityCollection[clientID].AddOwnedObject(objectID);
         }
 
         private void OnObjectUnregistered(int clientID, int objectID)
         {
             //If this object is owned by the given client ID, remove it from their owned object collection.
-            if (MyServerWorldManager.Instance.GetObjectOwner(objectID) == clientID) m_clientEntityCollection[clientID].RemoveOwnedObject(objectID);
+            if (MyDedicatedServer.ServerObjectManager.GetObjectOwner(objectID) == clientID) m_clientEntityCollection[clientID].RemoveOwnedObject(objectID);
         }
 
         /// <summary>
@@ -98,12 +95,12 @@ namespace StylezDedicatedServer.Game.Manager
                 {
                     ar = m_threadedUpdateRequests.Dequeue();
                     List<int> inRange = new List<int>();
-                    List<MyWorldObject> inRangeO = new List<MyWorldObject>();
-                    MyWorldObject[] wos = MyServerWorldManager.Instance.GetObjects();
+                    List<MyDynamicObject> inRangeO = new List<MyDynamicObject>();
+                    MyDynamicObject[] wos = MyDedicatedServer.ServerObjectManager.GetAllObjects();
 
-                    foreach (MyWorldObject w in wos)
+                    foreach (MyDynamicObject w in wos)
                     {
-                        if (w.ObjectPosition.Dimension == ar.Dimension && w.DistanceTo(ar.PosX, ar.PosY, ar.PosZ) <= ar.StreamDistance)
+                        if (w.ObjectDimension == ar.Dimension && w.DistanceTo(ar.PosX, ar.PosY, ar.PosZ) <= ar.StreamDistance)
                         {
                             inRange.Add(w.ObjectID);
                             inRangeO.Add(w);
@@ -111,7 +108,7 @@ namespace StylezDedicatedServer.Game.Manager
                     }
                     MyClientEntityCollection ec = GetCollectionForClient(ar.ForClientID);
                     ec?.UpdateRangedObjectList(inRange.ToArray());
-                    MyClientManager.Instance.SendTransmissionToClient(ar.ForClientID, new StylezNetworkShared.Commands.MyNetCommand((int)EMyNetworkCommands.WORLD_AREA_UPDATE, JsonConvert.SerializeObject(new MyAreaUpdate(ec.RangedObjects.Length, inRangeO.ToArray()))));
+                    MyClientManager.Instance.SendTransmissionToClient(ar.ForClientID, new StylezNetworkShared.Commands.MyNetCommand((int)EMyNetworkCommands.WORLD_AREA_UPDATE, JsonConvert.SerializeObject(new MyDynamicObjectAreaUpdate(ec.RangedObjects.Length, inRangeO.ToArray()))));
                 }
             }
             MyLogger.LogInfo("Threaded area update stopping..");

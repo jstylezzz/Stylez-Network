@@ -9,11 +9,14 @@ using StylezDedicatedServer.Network;
 using StylezDedicatedServer.Events;
 using StylezDedicatedServer.Game.Commands;
 using StylezDedicatedServer.Game.Manager;
+using StylezNetworkShared.Manager;
 
 namespace StylezDedicatedServer.Core
 {
     public class MyDedicatedServer
     {
+        public static MyObjectManager ServerObjectManager { get; private set; }
+        
         public MyDedicatedServer()
         {
             MyLogger.LogInfo("Initializing server..");
@@ -29,7 +32,7 @@ namespace StylezDedicatedServer.Core
         private void InitializeGameSpecificInstances()
         {
             new MyServerCommandProcessor();
-            new MyServerWorldManager();
+            ServerObjectManager = new MyObjectManager();
             new MyClientWorldManager();
         }
 

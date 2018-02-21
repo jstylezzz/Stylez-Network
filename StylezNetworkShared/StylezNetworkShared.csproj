@@ -46,14 +46,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Commands\MyDynamicObjectAreaUpdate.cs" />
     <Compile Include="Commands\MyNetCommand.cs" />
     <Compile Include="Game\Commands\EMyNetworkCommands.cs" />
-    <Compile Include="Game\Commands\MyAreaUpdate.cs" />
     <Compile Include="Game\Commands\MyAreaUpdateRequest.cs" />
     <Compile Include="Game\Commands\MyClientAuthCommand.cs" />
-    <Compile Include="Game\World\Objects\MyMovementData.cs" />
-    <Compile Include="Game\World\Objects\MyWorldObject.cs" />
-    <Compile Include="Game\World\Objects\MyWorldPosition.cs" />
+    <Compile Include="Manager\MyObjectManager.cs" />
+    <Compile Include="Objects\EMyObjectType.cs" />
+    <Compile Include="Objects\MyDynamicObject.cs" />
+    <Compile Include="Objects\MyObjectBase.cs" />
     <Compile Include="Logging\MyLogger.cs" />
     <Compile Include="Network\MyNetPacket.cs" />
     <Compile Include="Network\MyWorkingSocket.cs" />

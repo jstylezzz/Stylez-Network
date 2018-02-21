@@ -23,10 +23,10 @@ namespace StylezNetworkShared.Game.Commands
         AUTHENTICATE,
 
         /// <summary>
-        /// Serverside: Register new object to the world manager.
+        /// Serverside: Register a new dynamic object to the world manager.
         /// Clientside: Nothing.
         /// </summary>
-        SPAWN_OBJECT,
+        SPAWN_DYNAMIC_OBJECT,
 
         /// <summary>
         /// Serverside: Send the list of objects in range to the client.
@@ -35,10 +35,10 @@ namespace StylezNetworkShared.Game.Commands
         WORLD_AREA_UPDATE,
 
         /// <summary>
-        /// Serverside: Receive data on changed objects by the client.
+        /// Serverside: Receive data on changed dynamic objects by the client.
         /// Clientside: Nothing.
         /// </summary>
-        MAKE_WORLD_AREA_UPDATE,
+        MAKE_DYNAMIC_WORLD_AREA_UPDATE,
 
         /// <summary>
         /// Serverside: Send a ping reply. 

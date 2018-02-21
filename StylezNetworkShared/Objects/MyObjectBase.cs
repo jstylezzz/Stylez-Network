@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StylezNetworkShared.Game.World.Objects
+namespace StylezNetworkShared.Objects
 {
     public class MyObjectBase
     {
         public string PrefabName { get; private set; }
+        public EMyObjectType ObjectType { get; private set; }
         public bool DestroyOnOwnerDisconnect { get; private set; }
         
         public int OwnerClientID { get; private set; }
@@ -20,12 +21,13 @@ namespace StylezNetworkShared.Game.World.Objects
 
         public int ObjectDimension { get; private set; }
 
-        public void Init(string prefabName, int id, int owner, bool destroyOnOwnerDisconnect = false)
+        public void Init(string prefabName, EMyObjectType type, int id, int owner, bool destroyOnOwnerDisconnect = false)
         {
             OwnerClientID = owner;
             ObjectID = id;
             PrefabName = prefabName;
             DestroyOnOwnerDisconnect = destroyOnOwnerDisconnect;
+            ObjectType = type;
         }
 
         public void UpdatePosition(float x, float y, float z)
@@ -38,6 +40,16 @@ namespace StylezNetworkShared.Game.World.Objects
         public void UpdateDimension(int d)
         {
             ObjectDimension = d;
+        }
+
+        public void UpdateOwnerClientID(int id)
+        {
+            OwnerClientID = id;
+        }
+
+        public void SetObjectID(int id)
+        {
+            ObjectID = id;
         }
     }
 }
