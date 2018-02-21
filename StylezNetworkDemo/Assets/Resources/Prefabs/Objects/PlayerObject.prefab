@@ -39,7 +39,6 @@ GameObject:
   - component: {fileID: 4560690062083958}
   - component: {fileID: 212278557934552038}
   - component: {fileID: 114027756889484314}
-  - component: {fileID: 114052331732524462}
   - component: {fileID: 50049059794692312}
   - component: {fileID: 58696135938282118}
   - component: {fileID: 114609700809714832}
@@ -165,22 +164,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9fb21bd30e141b4d83fae7a9bfaace6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_speed: 1.5
---- !u!114 &114052331732524462
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1663473371952226}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e7dc8d36c8982fa4bb5c4ae69c305810, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_destroyOnRemote:
-  - {fileID: 1467381026321306}
-  - {fileID: 50049059794692312}
-  - {fileID: 114027756889484314}
+  m_speed: 0.05
 --- !u!114 &114609700809714832
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -197,7 +181,7 @@ MonoBehaviour:
   - {fileID: 114027756889484314}
   - {fileID: 1467381026321306}
   m_maxDistanceForInterpolate: 40
-  m_interpolationMaxTimeSeconds: 4
+  m_interpolationMaxTimeSeconds: 1
 --- !u!124 &124372812686456870
 Behaviour:
   m_ObjectHideFlags: 1

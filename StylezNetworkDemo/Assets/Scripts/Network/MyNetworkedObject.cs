@@ -81,18 +81,26 @@ namespace StylezNetworkDemo.Network
 
         public void UpdateNetworkedObject(MyWorldObject wo)
         {
-            Vector3 woPos = new Vector3(wo.ObjectPosition.x, wo.ObjectPosition.y, wo.ObjectPosition.z);
-            m_worldObject.ObjectPosition.UpdatePosition(woPos.x, woPos.y, woPos.z);
-
-            if (Vector3.Distance(woPos, transform.position) > m_maxDistanceForInterpolate)
+            
+            if (IsALocalObject)
             {
-                transform.position = woPos;
+
             }
             else
             {
-                m_interpolateStartTime = DateTime.Now;
-                m_interpolateStartPos = transform.position;
-                m_interpolating = true;
+                Vector3 woPos = new Vector3(wo.ObjectPosition.x, wo.ObjectPosition.y, wo.ObjectPosition.z);
+                m_worldObject.ObjectPosition.UpdatePosition(woPos.x, woPos.y, woPos.z);
+
+                if (Vector3.Distance(woPos, transform.position) > m_maxDistanceForInterpolate)
+                {
+                    transform.position = woPos;
+                }
+                else if(!m_interpolating)
+                {
+                    m_interpolateStartTime = DateTime.Now;
+                    m_interpolateStartPos = transform.position;
+                    m_interpolating = true;
+                }
             }
         }
 
@@ -130,7 +138,7 @@ namespace StylezNetworkDemo.Network
         {
             float delta = (DateTime.Now - m_interpolateStartTime).Seconds / m_interpolationMaxTimeSeconds;
 
-            if(delta < 1)
+            if (delta < 1)
             {
                 transform.position = Vector3.Lerp(m_interpolateStartPos, new Vector3(m_worldObject.ObjectPosition.x, m_worldObject.ObjectPosition.y, m_worldObject.ObjectPosition.z), delta);
             }
@@ -145,9 +153,8 @@ namespace StylezNetworkDemo.Network
         {
             Vector3 woCurrent = new Vector3(m_worldObject.ObjectPosition.x, m_worldObject.ObjectPosition.y, m_worldObject.ObjectPosition.z);
             Vector3 towards = new Vector3(m_worldObject.MovementData.XDirection, m_worldObject.MovementData.YDirection, m_worldObject.MovementData.ZDirection) * m_worldObject.MovementData.Speed;
-            Vector3 newPos = Vector3.MoveTowards(woCurrent, woCurrent + (towards * Time.deltaTime), towards.sqrMagnitude);
-            m_worldObject.ObjectPosition.UpdatePosition(newPos.x, newPos.y, newPos.z);
             transform.Translate(towards);
+            m_worldObject.ObjectPosition.UpdatePosition(transform.position.x, transform.position.y, transform.position.z);
         }
 
         #endregion
