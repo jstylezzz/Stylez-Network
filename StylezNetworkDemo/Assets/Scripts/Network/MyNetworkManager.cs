@@ -209,7 +209,7 @@ namespace StylezNetworkDemo.Network
                         new Thread(SendAreaUpdate).Start();
 
                         MyDynamicObject dyno = new MyDynamicObject();
-                        dyno.Init("PlayerObject", EMyObjectType.OBJECT_DYNAMIC, -1, -1, true);
+                        dyno.Init("PlayerObject", EMyObjectType.OBJECT_DYNAMIC, -1, NetClient.ClientID, true);
                         m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.SPAWN_DYNAMIC_OBJECT, JsonConvert.SerializeObject(dyno)));
                         break;
                     }

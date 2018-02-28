@@ -48,7 +48,7 @@ namespace StylezDedicatedServer.Game.Commands
                     {
                         MyDynamicObject obj = JsonConvert.DeserializeObject<MyDynamicObject>(cmd.CommandJSON);
                         obj.UpdateOwnerClientID(fromClient.ClientID); //We set this here to prevent spoofing from the other end.
-                        MyDedicatedServer.ServerObjectManager.RegisterDynamicObject(obj); //Register the object to the world manager. It will auto-broadcast when clients perform area updates.
+                        MyDedicatedServer.ServerObjectManager.RegisterNewDynamicObject(obj); //Register the object to the world manager. It will auto-broadcast when clients perform area updates.
                         
                         break;
                     }
