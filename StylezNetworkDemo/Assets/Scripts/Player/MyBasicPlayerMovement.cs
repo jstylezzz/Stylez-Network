@@ -68,12 +68,12 @@ namespace StylezNetworkDemo.Player
                 if(IsStillMoving())
                 {
                     if (m_moveStartTime == -1) m_moveStartTime = Time.time;
-                    m_syncedObject.DynamicObject.UpdateVelocity(m_currentMovement.x, m_currentMovement.y, 0f);
+                    m_syncedObject.DynamicObjectInstance.UpdateVelocity(m_currentMovement.x, m_currentMovement.y, 0f);
                 }
                 else //Not moving anymore, send stop signal.
                 {
                     m_moveStartTime = -1;
-                    m_syncedObject.DynamicObject.UpdateVelocity(0f, 0f, 0f);
+                    m_syncedObject.DynamicObjectInstance.UpdateVelocity(0f, 0f, 0f);
                 }
             }
             m_cachedMovement = m_currentMovement;

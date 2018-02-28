@@ -15,7 +15,7 @@ namespace StylezNetworkDemo.Network
     /// <summary>
     ///
     /// </summary>
-    public class MyNetworkedObject : MonoBehaviour
+    public class MyNetworkedObject : MonoBehaviour, IMyDynamicObject
     {
         #region Inspector Variables
 
@@ -43,7 +43,9 @@ namespace StylezNetworkDemo.Network
 
         public bool IsALocalObject { get; private set; }
 
-        public MyDynamicObject DynamicObject { get { return m_dynamicObject; } }
+        public MyDynamicObject DynamicObjectInstance { get { return m_dynamicObject; } }
+
+        public Rigidbody DynamicObjectBody { get { return GetComponent<Rigidbody>(); } }
 
         #endregion
 

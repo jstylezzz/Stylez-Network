@@ -41,7 +41,7 @@ namespace StylezNetworkDemo.Network
             List<MyDynamicObject> so = new List<MyDynamicObject>();
             foreach (KeyValuePair<int, MyNetworkedObject> kv in m_syncedObjectDict)
             {
-                if (kv.Value.IsALocalObject) so.Add(kv.Value.DynamicObject);
+                if (kv.Value.IsALocalObject) so.Add(kv.Value.DynamicObjectInstance);
             }
 
             return so.ToArray();
@@ -66,7 +66,7 @@ namespace StylezNetworkDemo.Network
         public int Get(MyNetworkedObject instance)
         {
             if (!Contains(instance)) return -1;
-            else return instance.DynamicObject.ObjectID;
+            else return instance.DynamicObjectInstance.ObjectID;
         }
 
         public Dictionary<int, MyNetworkedObject> GetAll()
@@ -107,8 +107,8 @@ namespace StylezNetworkDemo.Network
 
         public void Register(MyNetworkedObject instance)
         {
-            if (!Contains(instance.DynamicObject.ObjectID)) m_syncedObjectDict.Add(instance.DynamicObject.ObjectID, instance);
-            else Debug.LogWarning($"[WARN]: Object with ID {instance.DynamicObject.ObjectID} already registered.");
+            if (!Contains(instance.DynamicObjectInstance.ObjectID)) m_syncedObjectDict.Add(instance.DynamicObjectInstance.ObjectID, instance);
+            else Debug.LogWarning($"[WARN]: Object with ID {instance.DynamicObjectInstance.ObjectID} already registered.");
         }
 
         public void Unregister(int id)
@@ -119,8 +119,8 @@ namespace StylezNetworkDemo.Network
 
         public void Unregister(MyNetworkedObject instance)
         {
-            if (Contains(instance.DynamicObject.ObjectID)) m_syncedObjectDict.Remove(instance.DynamicObject.ObjectID);
-            else Debug.LogWarning($"[WARN]: Object ID with ID {instance.DynamicObject.ObjectID} is not registered.");
+            if (Contains(instance.DynamicObjectInstance.ObjectID)) m_syncedObjectDict.Remove(instance.DynamicObjectInstance.ObjectID);
+            else Debug.LogWarning($"[WARN]: Object ID with ID {instance.DynamicObjectInstance.ObjectID} is not registered.");
         }
     }
 }
