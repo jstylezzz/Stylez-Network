@@ -10,6 +10,7 @@ using StylezNetworkDemo.Manager;
 using StylezNetworkShared.Commands;
 using StylezNetworkShared.Game.Commands;
 using StylezNetworkShared.Network;
+using StylezNetworkShared.Objects;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -89,9 +90,9 @@ namespace StylezNetworkDemo.Network
             //Debug.Log($"RECEIVED {message.CommandID}: " + message.CommandJSON);
         }
 
-        private void PerformAreaUpdate(MyAreaUpdate u)
+        private void PerformAreaUpdate(MyDynamicObjectAreaUpdate u)
         {
-            if (u.WorldObjects == null) return;
+            if (u.DynamicObjects == null) return;
 
             Dictionary<int, MyNetworkedObject> existingObjects = m_netObjectManager.GetAll();
 
@@ -103,15 +104,15 @@ namespace StylezNetworkDemo.Network
             //Loop through all the objects in range. 
             //Objects that are in range are removed from the deleteObjects list.
             //We will be left with a list consisting of objects that are no longer in range.
-            foreach (MyWorldObject p in u.WorldObjects)
+            foreach (MyDynamicObject p in u.DynamicObjects)
             {
                 bool exists = m_netObjectManager.Contains(p.ObjectID);
 
                 //New object. Add SyncedObject component to it and initialize it.
                 if (exists == false)
                 {
-                    g = Instantiate(MyPrefabManager.Instance.Get(p.ObjectPrefabName));
-                    g.transform.position = new Vector3(p.ObjectPosition.x, p.ObjectPosition.y, p.ObjectPosition.z);
+                    g = Instantiate(MyPrefabManager.Instance.Get(p.PrefabName));
+                    g.transform.position = new Vector3(p.PosX, p.PosY, p.PosZ);
                     so = g.GetComponent<MyNetworkedObject>();
                     so.SetupNetworkedObject(p);
                 }
@@ -176,14 +177,14 @@ namespace StylezNetworkDemo.Network
 
         private void SendAreaUpdate()
         {
-            MyWorldObject[] updates;
+            MyDynamicObject[] updates;
 
             while (m_performUpdates)
             {
                 updates = MyNetObjectManager.Instance.GetLocalObjectsForUpdate();
                 if(updates.Length > 0)
                 {
-                    m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.MAKE_WORLD_AREA_UPDATE, JsonConvert.SerializeObject(new MyAreaUpdate(updates.Length, updates))));
+                    m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.MAKE_DYNAMIC_WORLD_AREA_UPDATE, JsonConvert.SerializeObject(new MyDynamicObjectAreaUpdate(updates.Length, updates))));
                 }
                 Thread.Sleep(250);
                 if (!m_performUpdates) break;
@@ -206,13 +207,16 @@ namespace StylezNetworkDemo.Network
                         m_performUpdates = true;
                         new Thread(SendAreaUpdateRequest).Start();
                         new Thread(SendAreaUpdate).Start();
-                        m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.SPAWN_OBJECT, JsonConvert.SerializeObject(new MyWorldObject(0, 1, 0, "PlayerObject", true))));
+
+                        MyDynamicObject dyno = new MyDynamicObject();
+                        dyno.Init("PlayerObject", EMyObjectType.OBJECT_DYNAMIC, -1, -1, true);
+                        m_netClient.SendTransmission(new MyNetCommand((int)EMyNetworkCommands.SPAWN_DYNAMIC_OBJECT, JsonConvert.SerializeObject(dyno)));
                         break;
                     }
                     case EMyNetworkCommands.WORLD_AREA_UPDATE:
                     {
                         m_areaUpdateAnswered = true;
-                        PerformAreaUpdate(JsonConvert.DeserializeObject<MyAreaUpdate>(message.CommandJSON));
+                        PerformAreaUpdate(JsonConvert.DeserializeObject<MyDynamicObjectAreaUpdate>(message.CommandJSON));
                         break;
                     }
                     case EMyNetworkCommands.PERFORM_PING:

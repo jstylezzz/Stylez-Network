@@ -5,6 +5,7 @@
 * 
 */
 
+using StylezNetworkShared.Objects;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -35,12 +36,12 @@ namespace StylezNetworkDemo.Network
             return m_syncedObjectDict.ContainsValue(so);
         }
 
-        public MyWorldObject[] GetLocalObjectsForUpdate()
+        public MyDynamicObject[] GetLocalObjectsForUpdate()
         {
-            List<MyWorldObject> so = new List<MyWorldObject>();
+            List<MyDynamicObject> so = new List<MyDynamicObject>();
             foreach (KeyValuePair<int, MyNetworkedObject> kv in m_syncedObjectDict)
             {
-                if (kv.Value.IsALocalObject) so.Add(kv.Value.WorldObject);
+                if (kv.Value.IsALocalObject) so.Add(kv.Value.DynamicObject);
             }
 
             return so.ToArray();
@@ -65,7 +66,7 @@ namespace StylezNetworkDemo.Network
         public int Get(MyNetworkedObject instance)
         {
             if (!Contains(instance)) return -1;
-            else return instance.WorldObject.ObjectID;
+            else return instance.DynamicObject.ObjectID;
         }
 
         public Dictionary<int, MyNetworkedObject> GetAll()
@@ -106,8 +107,8 @@ namespace StylezNetworkDemo.Network
 
         public void Register(MyNetworkedObject instance)
         {
-            if (!Contains(instance.WorldObject.ObjectID)) m_syncedObjectDict.Add(instance.WorldObject.ObjectID, instance);
-            else Debug.LogWarning($"[WARN]: Object with ID {instance.WorldObject.ObjectID} already registered.");
+            if (!Contains(instance.DynamicObject.ObjectID)) m_syncedObjectDict.Add(instance.DynamicObject.ObjectID, instance);
+            else Debug.LogWarning($"[WARN]: Object with ID {instance.DynamicObject.ObjectID} already registered.");
         }
 
         public void Unregister(int id)
@@ -118,8 +119,8 @@ namespace StylezNetworkDemo.Network
 
         public void Unregister(MyNetworkedObject instance)
         {
-            if (Contains(instance.WorldObject.ObjectID)) m_syncedObjectDict.Remove(instance.WorldObject.ObjectID);
-            else Debug.LogWarning($"[WARN]: Object ID with ID {instance.WorldObject.ObjectID} is not registered.");
+            if (Contains(instance.DynamicObject.ObjectID)) m_syncedObjectDict.Remove(instance.DynamicObject.ObjectID);
+            else Debug.LogWarning($"[WARN]: Object ID with ID {instance.DynamicObject.ObjectID} is not registered.");
         }
     }
 }

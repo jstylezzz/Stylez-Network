@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,18 +7,36 @@ using System.Threading.Tasks;
 
 namespace StylezNetworkShared.Objects
 {
+    [Serializable]
     public class MyDynamicObject : MyObjectBase
     {
+        [JsonProperty]
         public float VelocityX { get; private set; }
+
+        [JsonProperty]
         public float VelocityY { get; private set; }
+
+        [JsonProperty]
         public float VelocityZ { get; private set; }
 
+
+        [JsonProperty]
         public float AngularDrag { get; private set; }
+
+        [JsonProperty]
         public float Drag { get; private set; }
+
+        [JsonProperty]
         public float Mass { get; private set; }
 
+
+        [JsonProperty]
         public float AngularVelocityX { get; private set; }
+
+        [JsonProperty]
         public float AngularVelocityY { get; private set; }
+
+        [JsonProperty]
         public float AngularVelocityZ { get; private set; }
 
         public void UpdateAngularDrag(float ad)

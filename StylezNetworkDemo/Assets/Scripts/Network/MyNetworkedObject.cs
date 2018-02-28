@@ -6,6 +6,7 @@
 */
 
 using StylezNetworkDemo.Utiliy;
+using StylezNetworkShared.Objects;
 using System;
 using UnityEngine;
 
@@ -31,7 +32,7 @@ namespace StylezNetworkDemo.Network
 
         #region Variables
 
-        private MyWorldObject m_worldObject;
+        private MyDynamicObject m_dynamicObject;
         private bool m_interpolating = false;
         private DateTime m_interpolateStartTime;
         private Vector3 m_interpolateStartPos;
@@ -42,7 +43,7 @@ namespace StylezNetworkDemo.Network
 
         public bool IsALocalObject { get; private set; }
 
-        public MyWorldObject WorldObject { get { return m_worldObject; } }
+        public MyDynamicObject DynamicObject { get { return m_dynamicObject; } }
 
         #endregion
 
@@ -69,14 +70,14 @@ namespace StylezNetworkDemo.Network
 
         #region Public Methods
 
-        public void SetupNetworkedObject(MyWorldObject wo)
+        public void SetupNetworkedObject(MyDynamicObject wo)
         {
-            m_worldObject = wo;
+            m_dynamicObject = wo;
             OwnershipCheck();
             MyNetObjectManager.Instance.Register(this);
         }
 
-        public void UpdateNetworkedObject(MyWorldObject wo)
+        public void UpdateNetworkedObject(MyDynamicObject wo)
         {
             
             if (IsALocalObject)
@@ -85,8 +86,8 @@ namespace StylezNetworkDemo.Network
             }
             else
             {
-                Vector3 woPos = new Vector3(wo.ObjectPosition.x, wo.ObjectPosition.y, wo.ObjectPosition.z);
-                m_worldObject.ObjectPosition.UpdatePosition(woPos.x, woPos.y, woPos.z);
+                Vector3 woPos = new Vector3(wo.PosX, wo.PosY, wo.PosZ);
+                m_dynamicObject.UpdatePosition(woPos.x, woPos.y, woPos.z);
 
                 if (Vector3.Distance(woPos, transform.position) > m_maxDistanceForInterpolate)
                 {
@@ -101,19 +102,19 @@ namespace StylezNetworkDemo.Network
             }
         }
 
-        public void UpdateNetworkedObjectForces(MyMovementData md)
-        {
-            m_worldObject.MovementData.UpdateMovement(md.XDirection, md.YDirection, md.ZDirection, md.Speed, md.IsMoving);
-        }
+        //public void UpdateNetworkedObjectForces(MyMovementData md)
+        //{
+        //    m_dynamicObject.MovementData.UpdateMovement(md.XDirection, md.YDirection, md.ZDirection, md.Speed, md.IsMoving);
+        //}
 
-        public void NullifyNetworkedObjectForces()
-        {
-            m_worldObject.MovementData.StopAllMovement();
-        }
+        //public void NullifyNetworkedObjectForces()
+        //{
+        //    m_dynamicObject.MovementData.StopAllMovement();
+        //}
 
         public void DeleteObject()
         {
-            MyNetObjectManager.Instance.Unregister(m_worldObject.ObjectID);
+            MyNetObjectManager.Instance.Unregister(m_dynamicObject.ObjectID);
             Destroy(gameObject);
         }
 
@@ -123,7 +124,7 @@ namespace StylezNetworkDemo.Network
 
         private void OwnershipCheck()
         {
-            if (MyOwnershipUtility.GetObjectOwner(m_worldObject) != EMyMultiplayerSide.SIDE_SELF)
+            if (MyOwnershipUtility.GetObjectOwner(m_dynamicObject) != EMyMultiplayerSide.SIDE_SELF)
             {
                 foreach (UnityEngine.Object o in m_objectsToDeleteRemote) Destroy(o);
                 IsALocalObject = false;
@@ -137,21 +138,24 @@ namespace StylezNetworkDemo.Network
 
             if (delta < 1)
             {
-                transform.position = Vector3.Lerp(m_interpolateStartPos, new Vector3(m_worldObject.ObjectPosition.x, m_worldObject.ObjectPosition.y, m_worldObject.ObjectPosition.z), delta);
+                transform.position = Vector3.Lerp(m_interpolateStartPos, new Vector3(m_dynamicObject.PosX, m_dynamicObject.PosY, m_dynamicObject.PosZ), delta);
             }
             else
             {
                 m_interpolating = false;
-                transform.position = new Vector3(m_worldObject.ObjectPosition.x, m_worldObject.ObjectPosition.y, m_worldObject.ObjectPosition.z);
+                transform.position = new Vector3(m_dynamicObject.PosX, m_dynamicObject.PosY, m_dynamicObject.PosZ);
             }
         }
 
         private void PerformMovement()
         {
-            Vector3 woCurrent = new Vector3(m_worldObject.ObjectPosition.x, m_worldObject.ObjectPosition.y, m_worldObject.ObjectPosition.z);
-            Vector3 towards = new Vector3(m_worldObject.MovementData.XDirection, m_worldObject.MovementData.YDirection, m_worldObject.MovementData.ZDirection) * m_worldObject.MovementData.Speed;
-            transform.Translate(towards);
-            m_worldObject.ObjectPosition.UpdatePosition(transform.position.x, transform.position.y, transform.position.z);
+            //TODO
+            //Fix movement with the new movement data from DynamicObject instance.
+
+            //Vector3 woCurrent = new Vector3(m_dynamicObject.PosX, m_dynamicObject.PosY, m_dynamicObject.PosZ);
+            //Vector3 towards = new Vector3(m_dynamicObject.x, m_dynamicObject.MovementData.YDirection, m_dynamicObject.MovementData.ZDirection) * m_dynamicObject.MovementData.Speed;
+            //transform.Translate(towards);
+            //m_dynamicObject.ObjectPosition.UpdatePosition(transform.position.x, transform.position.y, transform.position.z);
         }
 
         #endregion

@@ -6,6 +6,7 @@
 */
 
 using StylezNetworkDemo.Network;
+using StylezNetworkShared.Objects;
 
 namespace StylezNetworkDemo.Utiliy
 {
@@ -14,9 +15,9 @@ namespace StylezNetworkDemo.Utiliy
     /// </summary>
     public static class MyOwnershipUtility
     {
-        public static EMyMultiplayerSide GetObjectOwner(MyWorldObject wo)
+        public static EMyMultiplayerSide GetObjectOwner(MyDynamicObject wo)
         {
-            if (MyNetworkManager.Instance.NetClient.ClientID == wo.OwnerID) return EMyMultiplayerSide.SIDE_SELF;
+            if (MyNetworkManager.Instance.NetClient.ClientID == wo.OwnerClientID) return EMyMultiplayerSide.SIDE_SELF;
             else return EMyMultiplayerSide.SIDE_OTHER;
         }
 
