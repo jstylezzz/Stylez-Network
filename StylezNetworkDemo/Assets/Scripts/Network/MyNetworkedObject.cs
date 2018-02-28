@@ -149,13 +149,10 @@ namespace StylezNetworkDemo.Network
 
         private void PerformMovement()
         {
-            //TODO
-            //Fix movement with the new movement data from DynamicObject instance.
-
-            //Vector3 woCurrent = new Vector3(m_dynamicObject.PosX, m_dynamicObject.PosY, m_dynamicObject.PosZ);
-            //Vector3 towards = new Vector3(m_dynamicObject.x, m_dynamicObject.MovementData.YDirection, m_dynamicObject.MovementData.ZDirection) * m_dynamicObject.MovementData.Speed;
-            //transform.Translate(towards);
-            //m_dynamicObject.ObjectPosition.UpdatePosition(transform.position.x, transform.position.y, transform.position.z);
+            Vector3 dynoCurrent = new Vector3(m_dynamicObject.PosX, m_dynamicObject.PosY, m_dynamicObject.PosZ);
+            Vector3 towards = dynoCurrent + (new Vector3(m_dynamicObject.VelocityX, m_dynamicObject.VelocityY, m_dynamicObject.VelocityZ) * Time.deltaTime);
+            transform.position = towards;
+            m_dynamicObject.UpdatePosition(towards.x, towards.y, towards.z);
         }
 
         #endregion
